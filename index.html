@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V7.9</title>
+<title>La Perrería Gourmet PV – V8.0</title>
 <style>
-  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --edit: #3498db; }
+  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
   
   header { padding:40px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
@@ -16,7 +16,6 @@
     border: 3px dashed var(--gold); 
     padding: 20px; 
     border-radius: 15px;
-    background: #0a0a0a;
   }
   #mainLogo { max-height: 120px; max-width: 100%; display: block; margin: auto; }
   .upload-text { color: var(--gold); font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
@@ -51,14 +50,11 @@
   .row-actions { display: flex; gap: 8px; }
   .sm-btn { padding: 8px 12px; font-size: 10px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; text-transform: uppercase; }
   .btn-edit { background: #333; color: var(--gold); border: 1px solid var(--gold); }
-  .btn-del { background: transparent; color: #888; }
 
-  /* STANDOUT BACKUP BUTTONS */
   .system-controls { text-align: center; padding: 40px 20px; background: #080808; border-top: 1px solid #222; margin-top: 50px; }
-  .btn-backup { background: var(--gold); color: #000; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+  .btn-backup { background: var(--gold); color: #000; }
   .btn-restore { background: #000; color: var(--gold); border: 2px solid var(--gold); }
-
-  .version-tag { text-align: center; font-size: 12px; color: #ffffff; font-weight: bold; margin-top: 20px; letter-spacing: 2px; text-transform: uppercase; }
+  .version-tag { text-align: center; font-size: 12px; color: #ffffff; font-weight: bold; margin-top: 20px; letter-spacing: 2px; }
 </style>
 </head>
 <body>
@@ -74,8 +70,8 @@
 <main>
   <div class="dash-grid">
     <div class="stat-card"><div class="stat-label">Chicken in Stock</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
-    <div class="stat-card"><div class="stat-label">Today's Total Sales</div><div id="todaySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card"><div class="stat-label">Kilos Sold Today</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Daily Revenue</div><div id="todaySales" class="stat-val">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Kilos Sold</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
   </div>
 
   <div class="action-bar">
@@ -85,17 +81,7 @@
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0; color:var(--gold); font-size:13px; letter-spacing:1px;">CLIENT DIRECTORY</h3>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Customer</th><th>Total Kilos</th><th>Last Date</th></tr></thead>
-        <tbody id="clientBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3 style="margin-top:0; color:var(--gold); font-size:13px; letter-spacing:1px;">TRANSACTION LOG</h3>
+    <h3 style="margin-top:0; color:var(--gold); font-size:13px;">TRANSACTION LOG</h3>
     <div class="table-container">
       <table>
         <thead><tr><th>Date</th><th>Entry</th><th>Weight</th><th>Total</th><th>Options</th></tr></thead>
@@ -104,13 +90,11 @@
     </div>
   </div>
 
-  <!-- BRIGHT SYSTEM CONTROLS -->
   <div class="system-controls">
-    <h4 style="color:var(--gold); margin-bottom:20px; font-size:11px; letter-spacing:2px;">DATA MANAGEMENT</h4>
     <button class="btn btn-backup" onclick="exportData()">💾 BACKUP ALL DATA</button>
     <button class="btn btn-restore" style="margin-left:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE DATA</button>
     <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-    <div class="version-tag">VERSION 7.9 • STABLE BUILD</div>
+    <div class="version-tag">VERSION 8.0 • FREE DELIVERY DEFAULT</div>
   </div>
 </main>
 
@@ -127,7 +111,7 @@
     <div style="display:flex; gap:10px; margin-top:10px;">
       <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" value="1" oninput="updateReceipt()"></div>
       <div style="flex:1;"><label>Price/kg</label><input id="sPrice" type="number" value="50" oninput="updateReceipt()"></div>
-      <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" value="10" oninput="updateReceipt()"></div>
+      <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" value="0" oninput="updateReceipt()"></div>
     </div>
 
     <div id="receiptPreview" class="receipt-preview">
@@ -170,10 +154,7 @@ function save() { localStorage.setItem("perreria_v7_7", JSON.stringify(bizData))
 
 function uploadLogo(event) {
     const reader = new FileReader();
-    reader.onload = function() {
-        bizData.logo = reader.result;
-        save();
-    };
+    reader.onload = function() { bizData.logo = reader.result; save(); };
     reader.readAsDataURL(event.target.files[0]);
 }
 
@@ -182,16 +163,12 @@ function openModal(id) {
     const today = new Date().toISOString().slice(0,10);
     if(id === 'saleModal') {
         document.getElementById('sDate').value = today;
+        document.getElementById('sDelivery').value = 0; // Default to 0
         updateReceipt();
     }
 }
 
-function closeModal(id) { 
-    document.getElementById(id).style.display = "none";
-    document.getElementById('editId').value = "";
-    document.getElementById('stEditId').value = "";
-    document.getElementById('exEditId').value = "";
-}
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 function updateReceipt() {
     const k = parseFloat(document.getElementById('sKilos').value) || 0;
@@ -203,7 +180,7 @@ function updateReceipt() {
     document.getElementById('receiptContent').innerHTML = `
         CLIENTE: ${document.getElementById('sClient').value || "..."}<br>
         PEDIDO: ${k}kg x $${p}/kg<br>
-        ENVÍO: $${del}<br>
+        ENVÍO: ${del === 0 ? '<span style="color:#25D366">FREE</span>' : '$'+del}<br>
         📍 DIR: ${document.getElementById('sAddress').value || "Delivery"}
     `;
 }
@@ -211,117 +188,63 @@ function updateReceipt() {
 function sendWhatsApp() {
     const k = document.getElementById('sKilos').value;
     const p = document.getElementById('sPrice').value;
-    const del = document.getElementById('sDelivery').value;
-    const total = (parseFloat(k)*parseFloat(p)) + parseFloat(del);
+    const del = parseFloat(document.getElementById('sDelivery').value) || 0;
+    const total = (parseFloat(k)*parseFloat(p)) + del;
     const client = document.getElementById('sClient').value;
     const phone = document.getElementById('sPhone').value.replace(/\D/g,'');
     
-    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n--------------------------\n*CLIENTE:* ${client}\n*PEDIDO:* ${k}kg x $${p} = $${k*p}\n*ENVÍO:* $${del}\n--------------------------\n*TOTAL A PAGAR: $${total} MXN*\n--------------------------\n📍 *DIR:* ${document.getElementById('sAddress').value}\n\n¡Gracias por preferir calidad gourmet!`);
+    const shippingText = del === 0 ? "FREE" : `$${del}`;
+    
+    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n--------------------------\n*CLIENTE:* ${client}\n*PEDIDO:* ${k}kg x $${p} = $${k*p}\n*ENVÍO:* ${shippingText}\n--------------------------\n*TOTAL A PAGAR: $${total} MXN*\n--------------------------\n📍 *DIR:* ${document.getElementById('sAddress').value}\n\n¡Gracias por preferir calidad gourmet!`);
     
     if(phone) window.open(`https://wa.me/${phone.length === 10 ? '52'+phone : phone}?text=${msg}`, '_blank');
 }
 
 function saveSale() {
-    const id = document.getElementById('editId').value;
     const k = parseFloat(document.getElementById('sKilos').value);
     const p = parseFloat(document.getElementById('sPrice').value);
     const del = parseFloat(document.getElementById('sDelivery').value);
-    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del, address: document.getElementById('sAddress').value, phone: document.getElementById('sPhone').value, pricePerKg: p, delFee: del };
-    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    const entry = { id: Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del, address: document.getElementById('sAddress').value, phone: document.getElementById('sPhone').value, pricePerKg: p, delFee: del };
     bizData.transactions.push(entry);
     save(); closeModal('saleModal');
 }
 
 function saveStock() {
-    const id = document.getElementById('stEditId').value;
-    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value), total: -parseFloat(document.getElementById('stCost').value) };
-    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    const entry = { id: Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value), total: -parseFloat(document.getElementById('stCost').value) };
     bizData.transactions.push(entry);
     save(); closeModal('stockModal');
 }
 
 function saveExpense() {
-    const id = document.getElementById('exEditId').value;
-    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('exDate').value, type: 'EXPENSE', client: document.getElementById('exNote').value, kilos: 0, total: -parseFloat(document.getElementById('exCost').value) };
-    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    const entry = { id: Date.now(), date: document.getElementById('exDate').value, type: 'EXPENSE', client: document.getElementById('exNote').value, kilos: 0, total: -parseFloat(document.getElementById('exCost').value) };
     bizData.transactions.push(entry);
     save(); closeModal('expenseModal');
 }
 
-function deleteTx(id) {
-    if(confirm("Confirm: Delete record?")) {
-        bizData.transactions = bizData.transactions.filter(t => t.id !== id);
-        save();
-    }
-}
-
-function editTx(id) {
-    const t = bizData.transactions.find(x => x.id === id);
-    if(t.type === 'SALE') {
-        openModal('saleModal');
-        document.getElementById('editId').value = t.id;
-        document.getElementById('saleTitle').innerText = "EDIT ORDER";
-        document.getElementById('sDate').value = t.date;
-        document.getElementById('sClient').value = t.client;
-        document.getElementById('sPhone').value = t.phone || "";
-        document.getElementById('sAddress').value = t.address || "";
-        document.getElementById('sKilos').value = t.kilos;
-        document.getElementById('sPrice').value = t.pricePerKg || 50;
-        document.getElementById('sDelivery').value = t.delFee || 0;
-        updateReceipt();
-    } else if(t.type === 'STOCK') {
-        openModal('stockModal');
-        document.getElementById('stEditId').value = t.id;
-        document.getElementById('stDate').value = t.date;
-        document.getElementById('stSupplier').value = t.client;
-        document.getElementById('stKilos').value = t.kilos;
-        document.getElementById('stCost').value = Math.abs(t.total);
-    } else {
-        openModal('expenseModal');
-        document.getElementById('exEditId').value = t.id;
-        document.getElementById('exDate').value = t.date;
-        document.getElementById('exNote').value = t.client;
-        document.getElementById('exCost').value = Math.abs(t.total);
-    }
-}
+function deleteTx(id) { if(confirm("Delete record?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
 
 function render() {
     const today = new Date().toISOString().slice(0,10);
     let dK = 0, dS = 0, stock = 0;
-    const clients = {};
-
     if(bizData.logo) {
         document.getElementById('mainLogo').src = bizData.logo;
         document.getElementById('mainLogo').style.display = "block";
         document.getElementById('logoLabel').style.display = "none";
     }
-
     const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
-    
     document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
         if(t.type === 'SALE') {
             stock -= t.kilos;
             if(t.date === today) { dK += t.kilos; dS += t.total; }
-            clients[t.client] = { kilos: (clients[t.client]?.kilos || 0) + t.kilos, date: t.date };
-        }
-        if(t.type === 'STOCK') stock += t.kilos;
-        
+        } else if(t.type === 'STOCK') { stock += t.kilos; }
         return `<tr>
             <td style="color:#888">${t.date.slice(5)}</td>
             <td><strong>${t.client}</strong></td>
             <td>${t.kilos ? t.kilos+'kg' : '-'}</td>
             <td style="color:${t.total > 0 ? 'var(--success)' : 'var(--danger)'}">$${Math.abs(t.total).toFixed(2)}</td>
-            <td class="row-actions">
-                <button class="sm-btn btn-edit" onclick="editTx(${t.id})">Edit</button>
-                <button class="sm-btn btn-del" onclick="deleteTx(${t.id})">X</button>
-            </td>
+            <td><button class="sm-btn" onclick="deleteTx(${t.id})">X</button></td>
         </tr>`;
     }).join("");
-
-    document.getElementById('clientBody').innerHTML = Object.keys(clients).map(name => `
-        <tr><td>${name}</td><td>${clients[name].kilos.toFixed(1)} kg</td><td>${clients[name].date}</td></tr>
-    `).join("");
-
     document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
     document.getElementById('todaySales').innerText = '$' + dS.toFixed(2);
     document.getElementById('todayKilos').innerText = dK.toFixed(1) + ' kg';
@@ -330,16 +253,12 @@ function render() {
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `Perreria_Backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    a.download = `Perreria_Backup.json`; a.click();
 }
 
 function importData(event) {
     const reader = new FileReader();
-    reader.onload = (e) => { 
-        if(confirm("This will replace your current data. Continue?")) {
-            bizData = JSON.parse(e.target.result); save(); 
-        }
-    };
+    reader.onload = (e) => { bizData = JSON.parse(e.target.result); save(); };
     reader.readAsText(event.target.files[0]);
 }
 
