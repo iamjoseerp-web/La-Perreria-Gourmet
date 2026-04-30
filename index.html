@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Master</title>
+<title>La Perrería Gourmet PV – V7.3</title>
 <style>
-  :root { --gold: #d4af37; --bg: #0b0b0b; --card-bg: #141414; --text: #f5f5f5; --danger: #cc0000; --success: #25D366; --wa: #25D366; }
+  :root { --gold: #d4af37; --bg: #0b0b0b; --card-bg: #141414; --text: #f5f5f5; --danger: #cc0000; --success: #25D366; }
   body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; }
   
   header { padding:20px; border-bottom: 3px solid var(--gold); background: #000; text-align: center; }
@@ -14,13 +14,11 @@
 
   main { padding:20px; max-width:1100px; margin:auto; }
 
-  /* DASHBOARD STATS */
   .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
   .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 20px; border-radius: 12px; border-top: 4px solid var(--gold); }
   .stat-label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: 900; }
   .stat-val { font-size: 24px; font-weight: 700; color: #fff; margin-top: 5px; }
 
-  /* ACTION BUTTONS */
   .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
   .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-gold { background: var(--gold); color: #000; }
@@ -28,20 +26,21 @@
   .btn-danger { background: #440000; color: #ff5a5a; }
   .btn-wa-action { background: var(--success); color: #000; width: 100%; margin-top: 10px; }
 
-  /* TABLES */
   .card { background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 15px; padding: 20px; margin-bottom: 25px; }
   .table-container { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; background: #080808; }
   th { text-align: left; color: var(--gold); padding: 12px; border-bottom: 2px solid #222; font-size: 11px; text-transform: uppercase; }
   td { padding: 12px; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
 
-  /* MODALS */
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-  .sheet { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 2px solid var(--gold); width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+  .sheet { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 2px solid var(--gold); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
   label { font-size: 11px; font-weight: 900; color: var(--gold); display: block; margin-top: 15px; text-transform: uppercase; }
   input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
   
+  .calc-display { background: #222; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold); margin-top: 5px; font-weight: bold; color: #fff; }
   .receipt-preview { background: #000; padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); margin-top: 15px; color: var(--success); font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+  .del-btn { background: #300; color: #ff5a5a; border: 1px solid #500; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 10px; }
+  .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
 </style>
 </head>
 <body>
@@ -74,128 +73,123 @@
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0; color:var(--gold); font-size:14px;">SALES & EXPENSES LEDGER</h3>
+    <h3 style="margin-top:0; color:var(--gold); font-size:14px;">SALES & STOCK LEDGER</h3>
     <div class="table-container">
       <table>
         <thead>
-          <tr><th>Date</th><th>Client/Item</th><th>Kilos</th><th>Total</th><th>WA</th><th></th></tr>
+          <tr><th>Date</th><th>Client/Supplier</th><th>Kilos</th><th>Total</th><th>Action</th></tr>
         </thead>
         <tbody id="ledgerBody"></tbody>
       </table>
     </div>
   </div>
 
-  <div style="text-align:center; padding:20px; opacity:0.5;">
-    <button class="btn btn-outline" style="font-size:10px;" onclick="exportData()">💾 BACKUP DATA</button>
+  <div style="text-align:center; padding:20px; opacity:0.3;">
+    <button class="btn btn-outline" style="font-size:10px;" onclick="exportData()">💾 BACKUP</button>
     <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-    <button class="btn btn-outline" style="font-size:10px; margin-left:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE DATA</button>
+    <button class="btn btn-outline" style="font-size:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE</button>
   </div>
+  
+  <div class="version-tag">Build: 7.3 (Calculated Totals)</div>
 </main>
 
 <!-- SALE MODAL -->
 <div id="saleModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin-top:0;">NEW ORDER</h2>
-    <label>Sale Date</label><input id="sDate" type="date">
-    <label>Client Name</label><input id="sClient" placeholder="First Last" oninput="updateReceipt()">
-    <label>WhatsApp Number</label><input id="sPhone" type="tel" placeholder="521..." oninput="updateReceipt()">
-    <label>Address</label><textarea id="sAddress" rows="2" placeholder="Street, Neighborhood" oninput="updateReceipt()"></textarea>
+    <h2 style="color:var(--gold); margin-top:0;">NEW SALE</h2>
+    <label>Date</label><input id="sDate" type="date">
+    <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
+    <label>WhatsApp</label><input id="sPhone" oninput="updateReceipt()">
+    <label>Address</label><textarea id="sAddress" rows="2" oninput="updateReceipt()"></textarea>
     
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <div><label>Kilos</label><input id="sKilos" type="number" step="0.1" value="1" oninput="applyDeliveryLogic()"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+      <div><label>Kilos</label><input id="sKilos" type="number" value="1" oninput="updateReceipt()"></div>
       <div><label>Price/kg</label><input id="sPrice" type="number" value="50" oninput="updateReceipt()"></div>
+      <div><label>Product Total</label><div id="prodTotalDisplay" class="calc-display">$0</div></div>
     </div>
     
-    <label>Delivery Fee (Pesos)</label>
+    <label>Delivery Fee (Default: 10)</label>
     <input id="sDelivery" type="number" value="10" oninput="updateReceipt()">
 
     <div id="receiptPreview" class="receipt-preview"></div>
-    
-    <button class="btn btn-wa-action" onclick="sendWhatsApp()">📱 SEND WHATSAPP RECEIPT</button>
-    <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="addSale()">SAVE TO LEDGER</button>
-    <button class="btn" style="width:100%; color:#555;" onclick="closeModal('saleModal')">CLOSE</button>
+    <button class="btn btn-wa-action" onclick="sendWhatsApp()">📱 SEND WHATSAPP</button>
+    <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="addSale()">SAVE SALE</button>
+    <button class="btn" style="width:100%; color:#555;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
 <!-- STOCK MODAL -->
 <div id="stockModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin-top:0;">RESTOCK INVENTORY</h2>
-    <label>Purchase Date</label><input id="stDate" type="date">
-    <label>Kilos Added</label><input id="stKilos" type="number" step="0.1">
-    <label>Total Cost ($)</label><input id="stCost" type="number">
-    <label>Supplier/Note</label><input id="stNote" placeholder="e.g. Butcher">
-    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="addStock()">UPDATE STOCK</button>
+    <h2 style="color:var(--gold); margin-top:0;">ADD STOCK</h2>
+    <label>Date</label><input id="stDate" type="date">
+    <label>Supplier / Vendor</label><input id="stSupplier" placeholder="Meat Source">
+    <label>Kilos Received</label><input id="stKilos" type="number" step="0.1">
+    <label>Cost ($)</label><input id="stCost" type="number">
+    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="addStock()">SAVE STOCK</button>
     <button class="btn" style="width:100%; color:#555;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
 <!-- EXPENSE MODAL -->
 <div id="expenseModal" class="modal"><div class="sheet">
     <h2 style="color:#ff5a5a; margin-top:0;">RECORD EXPENSE</h2>
-    <label>Expense Date</label><input id="exDate" type="date">
-    <label>Description</label><input id="exNote" placeholder="e.g. Gas, Bags">
+    <label>Date</label><input id="exDate" type="date">
+    <label>Description</label><input id="exNote">
     <label>Amount ($)</label><input id="exCost" type="number">
-    <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="addExpense()">SUBTRACT EXPENSE</button>
+    <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="addExpense()">SAVE EXPENSE</button>
     <button class="btn" style="width:100%; color:#555;" onclick="closeModal('expenseModal')">CANCEL</button>
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v6") || '{"stock":0, "transactions":[]}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v7") || '{"stock":0, "transactions":[]}');
 
-function save() { localStorage.setItem("perreria_v6", JSON.stringify(bizData)); render(); }
+function save() { localStorage.setItem("perreria_v7", JSON.stringify(bizData)); render(); }
 
 function openModal(id) { 
     const today = new Date().toISOString().slice(0,10);
-    if(id === 'saleModal') { document.getElementById('sDate').value = today; applyDeliveryLogic(); }
-    if(id === 'stockModal') { document.getElementById('stDate').value = today; }
-    if(id === 'expenseModal') { document.getElementById('exDate').value = today; }
+    document.querySelectorAll('input[type="date"]').forEach(i => i.value = today);
+    if(id === 'saleModal') { document.getElementById('sDelivery').value = 10; }
+    updateReceipt();
     document.getElementById(id).style.display = "flex"; 
 }
 
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
-function applyDeliveryLogic() {
-    const k = parseFloat(document.getElementById('sKilos').value) || 0;
-    // Free delivery if 5kg or more, else 10 pesos
-    document.getElementById('sDelivery').value = (k >= 5) ? 0 : 10;
-    updateReceipt();
-}
-
 function updateReceipt() {
-    const name = document.getElementById('sClient').value || "Customer";
-    const k = document.getElementById('sKilos').value || 0;
-    const p = document.getElementById('sPrice').value || 0;
+    const name = document.getElementById('sClient').value || "Cliente";
+    const k = parseFloat(document.getElementById('sKilos').value) || 0;
+    const p = parseFloat(document.getElementById('sPrice').value) || 0;
     const del = parseFloat(document.getElementById('sDelivery').value) || 0;
-    const addr = document.getElementById('sAddress').value || "Not set";
-    const total = (k * p) + del;
-
-    const msg = `🍗 *La Perrería Gourmet PV*\nConfirmed Order!\n\n` +
-                `Client: ${name}\n` +
-                `Order: ${k}kg @ $${p}\n` +
-                `Delivery: ${del > 0 ? '$' + del : 'FREE'}\n` +
-                `*Total: $${total} Pesos*\n\n` +
-                `📍 Address: ${addr}\n\n` +
-                `Thank you for choosing Natural!`;
     
+    const prodTotal = k * p;
+    document.getElementById('prodTotalDisplay').innerText = `$${prodTotal}`;
+    
+    const deliveryText = (del === 0) ? "GRATIS" : `$${del}`;
+    const grandTotal = prodTotal + del;
+
+    // Spanish Receipt Body
+    const msg = `🍗 *La Perrería Gourmet PV*\n¡Pedido Confirmado!\n\nCliente: ${name}\nOrden: ${k}kg ($${p}/kg)\nSubtotal: $${prodTotal}\nEnvío: ${deliveryText}\n*Total: $${grandTotal} MXN*\n\n📍 Entrega: ${document.getElementById('sAddress').value || 'Por definir'}\n\n¡Gracias por su compra!`;
     document.getElementById('receiptPreview').innerText = msg;
 }
 
 function sendWhatsApp() {
     const phone = document.getElementById('sPhone').value.replace(/\D/g,'');
     const msg = encodeURIComponent(document.getElementById('receiptPreview').innerText);
-    if(!phone) return alert("Enter a phone number.");
-    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    if(phone) {
+        const prefix = phone.length === 10 ? '52' : '';
+        window.open(`https://wa.me/${prefix}${phone}?text=${msg}`, '_blank');
+    }
 }
 
 function addSale() {
     const k = parseFloat(document.getElementById('sKilos').value);
     const p = parseFloat(document.getElementById('sPrice').value);
     const del = parseFloat(document.getElementById('sDelivery').value);
-    bizData.transactions.push({ id: Date.now(), date: document.getElementById('sDate').value, type: 'sale', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del, phone: document.getElementById('sPhone').value.replace(/\D/g,'') });
+    bizData.transactions.push({ id: Date.now(), date: document.getElementById('sDate').value, type: 'sale', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del });
     bizData.stock -= k;
     save(); closeModal('saleModal');
 }
 
 function addStock() {
     const k = parseFloat(document.getElementById('stKilos').value);
-    bizData.transactions.push({ id: Date.now(), date: document.getElementById('stDate').value, type: 'purchase', client: document.getElementById('stNote').value, kilos: k, total: -parseFloat(document.getElementById('stCost').value) });
+    bizData.transactions.push({ id: Date.now(), date: document.getElementById('stDate').value, type: 'stock', client: document.getElementById('stSupplier').value, kilos: k, total: -parseFloat(document.getElementById('stCost').value) });
     bizData.stock += k;
     save(); closeModal('stockModal');
 }
@@ -205,25 +199,30 @@ function addExpense() {
     save(); closeModal('expenseModal');
 }
 
-function deleteTx(id) { if(confirm("Remove?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
+function deleteTx(id) {
+    if(confirm("Delete this entry and adjust stock?")) {
+        const tx = bizData.transactions.find(t => t.id === id);
+        if(tx.type === 'sale') bizData.stock += tx.kilos;
+        if(tx.type === 'stock') bizData.stock -= tx.kilos;
+        bizData.transactions = bizData.transactions.filter(t => t.id !== id);
+        save();
+    }
+}
 
 function render() {
     const today = new Date().toISOString().slice(0,10);
-    let dK = 0; let dS = 0;
+    let dK = 0, dS = 0;
     document.getElementById('stockVal').innerText = bizData.stock.toFixed(1) + ' kg';
     const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
-    const body = document.getElementById('ledgerBody');
-    body.innerHTML = sorted.map(t => {
+    document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
         if(t.date === today && t.type === 'sale') { dK += t.kilos; dS += t.total; }
-        const color = t.type === 'sale' ? 'var(--success)' : '#ff5a5a';
-        const waLink = t.phone ? `<a href="https://wa.me/${t.phone}" target="_blank" style="text-decoration:none; color:var(--success);">WA</a>` : '';
+        const color = t.total > 0 ? 'var(--success)' : '#ff5a5a';
         return `<tr>
-            <td>${t.date.split('-').slice(1).join('/')}</td>
-            <td><div style="font-weight:bold;">${t.client}</div><div style="font-size:9px; opacity:0.5;">${t.type.toUpperCase()}</div></td>
+            <td>${t.date.slice(5)}</td>
+            <td><strong>${t.client}</strong><br><small style="color:#666">${t.type.toUpperCase()}</small></td>
             <td>${t.kilos ? t.kilos+'kg' : '-'}</td>
             <td style="color:${color}; font-weight:bold;">$${Math.abs(t.total).toFixed(2)}</td>
-            <td>${waLink}</td>
-            <td><button style="background:none; border:none; color:#333;" onclick="deleteTx(${t.id})">✕</button></td>
+            <td><button class="del-btn" onclick="deleteTx(${t.id})">DELETE</button></td>
         </tr>`;
     }).join("");
     document.getElementById('todaySales').innerText = '$' + dS.toFixed(2);
@@ -233,7 +232,7 @@ function render() {
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `Perreria_Data.json`; a.click();
+    a.download = `Perreria_V7_3_Backup.json`; a.click();
 }
 
 function importData(event) {
