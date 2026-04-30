@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Version 9.8 (BATCH SUMMARY)</title>
+<title>La Perrería Gourmet PV – Version 10.0 (TRI-STOCK)</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 150px; }
@@ -13,11 +13,11 @@
   #mainLogo { max-height: 100px; max-width: 100%; display: block; margin: auto; }
 
   main { padding:20px; max-width:1100px; margin:auto; }
-  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 25px; }
   .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); }
   .stat-card.delivery { border-left-color: var(--blue); }
-  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
-  .stat-val { font-size: 20px; font-weight: 700; color: #fff; margin-top: 4px; }
+  .stat-label { font-size: 8px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
+  .stat-val { font-size: 18px; font-weight: 700; color: #fff; margin-top: 4px; }
 
   .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
   .btn { padding: 12px 18px; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
@@ -67,11 +67,11 @@
   </div>
 
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Stock Remaining</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Chicken Main</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card" style="border-left-color: #eee;"><div class="stat-label">Gizzards</div><div id="gizVal" class="stat-val">0g</div></div>
+    <div class="stat-card" style="border-left-color: #eee;"><div class="stat-label">Feet</div><div id="feetVal" class="stat-val">0g</div></div>
     <div class="stat-card"><div class="stat-label">Product Rev</div><div id="todaySales" class="stat-val">$0.00</div></div>
     <div class="stat-card delivery"><div class="stat-label">Delivery Rev</div><div id="deliverySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card"><div class="stat-label">Paid Kilos</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
-    <div class="stat-card" style="border-left-color:#555;"><div class="stat-label">Free Kilos</div><div id="freeKilos" class="stat-val">0.0 kg</div></div>
   </div>
 
   <div class="action-bar">
@@ -79,13 +79,6 @@
     <button class="btn btn-outline" onclick="openModal('stockModal')">+ Stock</button>
     <button class="btn btn-danger-action" onclick="openModal('expenseModal')">+ Expense / Loss</button>
     <button class="btn" style="background:#440000; color:var(--gold); border:1px solid var(--danger);" onclick="closeBatch()">Close Batch</button>
-  </div>
-
-  <!-- PRODUCT SELECTOR BUTTONS (ADDED) -->
-  <div class="action-bar" style="justify-content: flex-start; gap: 5px;">
-     <button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="quickProduct('CHICKEN')">CHICKEN (Main)</button>
-     <button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="quickProduct('GIZZARDS')">GIZZARDS</button>
-     <button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="quickProduct('FEET')">FEET</button>
   </div>
 
   <div class="card">
@@ -97,20 +90,34 @@
       </table>
     </div>
   </div>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="margin:0; color:var(--gold); font-size:12px; letter-spacing:1px;">SAVED BATCH PERFORMANCE</h3>
+        <button class="btn-sm" style="background:#440000; color:#fff;" onclick="clearHistory()">CLEAR ALL HISTORY</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Period</th><th>Days</th><th>Kilos Sold</th><th>Product $</th><th>Deliv $</th><th>Exp/Loss</th><th>NET INCOME</th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
 </main>
 
-<footer>LA PERRERÍA GOURMET PV – VERSION 9.8</footer>
+<footer>LA PERRERÍA GOURMET PV – VERSION 10.0</footer>
 
-<!-- MODALS -->
 <div id="expenseModal" class="modal"><div class="sheet">
     <h2 style="color:var(--gold); margin:0;" id="exTitle">EXPENSE OR LOSS</h2>
     <input type="hidden" id="editExId">
     <label>Type</label>
     <select id="exType"><option value="EXPENSE">BUSINESS EXPENSE</option><option value="LOSS">PRODUCT LOSS</option></select>
+    <label>Product Affecting (If Loss)</label>
+    <select id="exProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option><option value="FEET">FEET</option></select>
     <label>Date</label><input id="exDate" type="date">
     <label>Description</label><input id="exNote" placeholder="What was it for?">
     <label>Cost ($)</label><input id="exCost" type="number" step="0.01">
-    <label>Kilos (If Loss)</label><input id="exKilos" type="number" step="0.1">
+    <label>Qty (Kilos/Grams)</label><input id="exKilos" type="number" step="0.1">
     <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveExpense()">SAVE ENTRY</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
 </div></div>
@@ -119,12 +126,18 @@
     <h2 style="color:var(--gold); margin:0;" id="sTitle">NEW ORDER</h2>
     <input type="hidden" id="editSId">
     <input id="sDate" type="date">
-    <label>Client Name / Product</label><input id="sClient" oninput="updateReceipt()">
+    <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
+    <label>Select Product</label>
+    <select id="sProd" onchange="updateReceipt()">
+        <option value="CHICKEN">CHICKEN (MAIN)</option>
+        <option value="GIZZARDS">GIZZARDS (TREAT)</option>
+        <option value="FEET">FEET (TREAT)</option>
+    </select>
     <label>WhatsApp (Digits only)</label><input id="sPhone">
     <label>Address</label><input id="sAddress" oninput="updateReceipt()">
     <div style="display:flex; gap:10px;">
-      <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" oninput="updateReceipt()"></div>
-      <div style="flex:1;"><label>Price/Kg</label><input id="sPrice" type="number" oninput="updateReceipt()"></div>
+      <div style="flex:1;"><label>Qty (Kg or Grams)</label><input id="sKilos" type="number" step="0.1" oninput="updateReceipt()"></div>
+      <div style="flex:1;"><label>Price/Unit</label><input id="sPrice" type="number" oninput="updateReceipt()"></div>
       <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" oninput="updateReceipt()"></div>
     </div>
     <div id="receiptPreview" class="receipt-preview"><div id="receiptContent">...</div><div style="text-align:center; margin-top:10px; font-weight:bold; color:var(--gold); font-size:18px;" id="grandTotalLabel">TOTAL: $0</div></div>
@@ -137,8 +150,14 @@
     <h2 style="color:var(--gold); margin:0;" id="stTitle">ADD STOCK</h2>
     <input type="hidden" id="editStId">
     <input id="stDate" type="date">
-    <label>Product / Provider</label><input id="stSupplier" placeholder="e.g. Meat, Gizzards, Feet">
-    <label>Kilos Received</label><input id="stKilos" type="number" step="0.1">
+    <label>Category</label>
+    <select id="stProd">
+        <option value="CHICKEN">CHICKEN (KILOS)</option>
+        <option value="GIZZARDS">GIZZARDS (GRAMS)</option>
+        <option value="FEET">FEET (GRAMS)</option>
+    </select>
+    <label>Provider / Note</label><input id="stSupplier" placeholder="e.g. Supplier name">
+    <label>Amount (Kilos/Grams)</label><input id="stKilos" type="number" step="0.1">
     <label>Total Cost ($)</label><input id="stCost" type="number" step="0.01">
     <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveStock()">SAVE STOCK</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
@@ -146,16 +165,11 @@
 
 <script>
 let bizData = JSON.parse(localStorage.getItem("perreria_v9") || '{"transactions":[], "logo": null, "batchHistory": []}');
+if(!bizData.batchHistory) bizData.batchHistory = [];
 
 function save() { 
     localStorage.setItem("perreria_v9", JSON.stringify(bizData)); 
     render(); 
-}
-
-function quickProduct(prod) {
-    openModal('saleModal');
-    document.getElementById('sClient').value = prod;
-    updateReceipt();
 }
 
 function openModal(id) { 
@@ -163,17 +177,16 @@ function openModal(id) {
     if(id === 'expenseModal') {
         document.getElementById('editExId').value = ""; document.getElementById('exNote').value = ""; 
         document.getElementById('exCost').value = 0; document.getElementById('exKilos').value = 0; 
-        document.getElementById('exType').value = "EXPENSE"; document.getElementById('exTitle').innerText = "EXPENSE OR LOSS";
+        document.getElementById('exType').value = "EXPENSE";
     } else if(id === 'saleModal') {
         document.getElementById('editSId').value = ""; document.getElementById('sClient').value = ""; 
         document.getElementById('sPhone').value = ""; document.getElementById('sAddress').value = ""; 
         document.getElementById('sKilos').value = 0; document.getElementById('sPrice').value = 50; 
-        document.getElementById('sDelivery').value = 10; document.getElementById('sTitle').innerText = "NEW ORDER";
+        document.getElementById('sDelivery').value = 10;
         updateReceipt();
     } else if(id === 'stockModal') {
         document.getElementById('editStId').value = ""; document.getElementById('stSupplier').value = ""; 
         document.getElementById('stKilos').value = 0; document.getElementById('stCost').value = 0;
-        document.getElementById('stTitle').innerText = "ADD STOCK";
     }
     document.getElementById(id).style.display = "flex"; 
     ['sDate', 'stDate', 'exDate'].forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = d; });
@@ -185,42 +198,48 @@ function editTx(id) {
     const t = bizData.transactions.find(x => x.id === id);
     if(!t) return;
     if(t.type === 'SALE') {
-        openModal('saleModal'); document.getElementById('sTitle').innerText = "EDIT ORDER";
+        openModal('saleModal');
         document.getElementById('editSId').value = t.id; document.getElementById('sDate').value = t.date;
         document.getElementById('sClient').value = t.client; document.getElementById('sPhone').value = t.phone || "";
         document.getElementById('sAddress').value = t.address || ""; document.getElementById('sKilos').value = t.kilos;
         document.getElementById('sPrice').value = t.pricePerKg; document.getElementById('sDelivery').value = t.delFee;
+        document.getElementById('sProd').value = t.product || "CHICKEN";
         updateReceipt();
     } else if(t.type === 'STOCK') {
-        openModal('stockModal'); document.getElementById('stTitle').innerText = "EDIT STOCK";
+        openModal('stockModal');
         document.getElementById('editStId').value = t.id; document.getElementById('stDate').value = t.date;
         document.getElementById('stSupplier').value = t.client; document.getElementById('stKilos').value = t.kilos;
         document.getElementById('stCost').value = Math.abs(t.total);
+        document.getElementById('stProd').value = t.product || "CHICKEN";
     } else {
-        openModal('expenseModal'); document.getElementById('exTitle').innerText = "EDIT " + t.type;
+        openModal('expenseModal');
         document.getElementById('editExId').value = t.id; document.getElementById('exDate').value = t.date;
         document.getElementById('exType').value = t.type; document.getElementById('exNote').value = t.client;
         document.getElementById('exCost').value = Math.abs(t.total); document.getElementById('exKilos').value = t.kilos || 0;
+        document.getElementById('exProd').value = t.product || "CHICKEN";
     }
 }
 
 function updateReceipt() {
     const k = parseFloat(document.getElementById('sKilos').value) || 0, p = parseFloat(document.getElementById('sPrice').value) || 0, d = parseFloat(document.getElementById('sDelivery').value) || 0;
+    const prod = document.getElementById('sProd').value;
+    const unit = prod === "CHICKEN" ? "kg" : "g";
     const total = (k * p) + d;
     document.getElementById('grandTotalLabel').innerText = `TOTAL: $${total} MXN`;
-    document.getElementById('receiptContent').innerText = `CLIENTE: ${document.getElementById('sClient').value || "..."}\nPEDIDO: ${k}kg x $${p}\nENVÍO: $${d}\n📍: ${document.getElementById('sAddress').value || "..."}`;
+    document.getElementById('receiptContent').innerText = `CLIENTE: ${document.getElementById('sClient').value || "..."}\nPRODUCTO: ${prod}\nPEDIDO: ${k}${unit} x $${p}\nENVÍO: $${d}\n📍: ${document.getElementById('sAddress').value || "..."}`;
 }
 
 function sendWhatsApp() {
-    const k = document.getElementById('sKilos').value, p = document.getElementById('sPrice').value, del = document.getElementById('sDelivery').value, phone = document.getElementById('sPhone').value.replace(/\D/g,'');
-    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n*PEDIDO:* ${k}kg x $${p}\n*ENVÍO:* $${del}\n*TOTAL: $${(k*p)+parseFloat(del)} MXN*`);
+    const k = document.getElementById('sKilos').value, p = document.getElementById('sPrice').value, del = document.getElementById('sDelivery').value, phone = document.getElementById('sPhone').value.replace(/\D/g,''), prod = document.getElementById('sProd').value;
+    const unit = prod === "CHICKEN" ? "kg" : "g";
+    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n*PEDIDO:* ${prod} (${k}${unit})\n*ENVÍO:* $${del}\n*TOTAL: $${(k*p)+parseFloat(del)} MXN*`);
     if(phone) window.open(`https://wa.me/${phone.length === 10 ? '52'+phone : phone}?text=${msg}`, '_blank');
 }
 
 function saveSale() {
     const id = document.getElementById('editSId').value;
     const oldTx = id ? bizData.transactions.find(x=>x.id==id) : null;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, phone: document.getElementById('sPhone').value, address: document.getElementById('sAddress').value, kilos: parseFloat(document.getElementById('sKilos').value) || 0, pricePerKg: parseFloat(document.getElementById('sPrice').value) || 0, delFee: parseFloat(document.getElementById('sDelivery').value) || 0, status: oldTx ? oldTx.status : 'PENDING' };
+    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, product: document.getElementById('sProd').value, phone: document.getElementById('sPhone').value, address: document.getElementById('sAddress').value, kilos: parseFloat(document.getElementById('sKilos').value) || 0, pricePerKg: parseFloat(document.getElementById('sPrice').value) || 0, delFee: parseFloat(document.getElementById('sDelivery').value) || 0, status: oldTx ? oldTx.status : 'PENDING' };
     data.total = (data.kilos * data.pricePerKg) + data.delFee;
     if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
     else { bizData.transactions.push(data); }
@@ -229,7 +248,7 @@ function saveSale() {
 
 function saveStock() {
     const id = document.getElementById('editStId').value;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value) || 0, total: -parseFloat(document.getElementById('stCost').value) || 0 };
+    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, product: document.getElementById('stProd').value, kilos: parseFloat(document.getElementById('stKilos').value) || 0, total: -parseFloat(document.getElementById('stCost').value) || 0 };
     if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
     else { bizData.transactions.push(data); }
     save(); closeModal('stockModal');
@@ -237,7 +256,7 @@ function saveStock() {
 
 function saveExpense() {
     const id = document.getElementById('editExId').value;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('exDate').value, type: document.getElementById('exType').value, client: document.getElementById('exNote').value, kilos: parseFloat(document.getElementById('exKilos').value) || 0, total: -parseFloat(document.getElementById('exCost').value) || 0 };
+    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('exDate').value, type: document.getElementById('exType').value, product: document.getElementById('exProd').value, client: document.getElementById('exNote').value, kilos: parseFloat(document.getElementById('exKilos').value) || 0, total: -parseFloat(document.getElementById('exCost').value) || 0 };
     if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
     else { bizData.transactions.push(data); }
     save(); closeModal('expenseModal');
@@ -248,46 +267,56 @@ function deleteTx(id) { if(confirm("Delete this entry forever?")) { bizData.tran
 
 function render() {
     const today = new Date().toLocaleDateString('sv-SE');
-    let stock = 0, prodRev = 0, delRev = 0, paidK = 0, freeK = 0;
+    let s_chicken = 0, s_giz = 0, s_feet = 0;
+    let prodRev = 0, delRev = 0;
     if(bizData.logo) { document.getElementById('mainLogo').src = bizData.logo; document.getElementById('mainLogo').style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
     
     document.getElementById('ledgerBody').innerHTML = bizData.transactions.sort((a,b) => b.id - a.id).map(t => {
         let typeBadge = '';
+        const prod = t.product || "CHICKEN";
         if(t.type === 'SALE') {
-            stock -= t.kilos;
-            if(t.date === today && t.status === 'COMPLETED') { prodRev += (t.kilos * t.pricePerKg); delRev += t.delFee; if(t.pricePerKg > 0) paidK += t.kilos; else freeK += t.kilos; }
+            if(prod === "CHICKEN") s_chicken -= t.kilos;
+            else if(prod === "GIZZARDS") s_giz -= t.kilos;
+            else s_feet -= t.kilos;
+
+            if(t.date === today && t.status === 'COMPLETED') { prodRev += (t.kilos * t.pricePerKg); delRev += t.delFee; }
             typeBadge = `<button class="badge ${t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending'}" onclick="toggleStatus(${t.id})">${t.status}</button>`;
         } else if (t.type === 'EXPENSE') { typeBadge = `<span class="badge badge-expense">EXPENSE</span>`; }
-        else if (t.type === 'LOSS') { stock -= t.kilos; typeBadge = `<span class="badge badge-loss">LOSS</span>`; }
-        else if (t.type === 'STOCK') { stock += t.kilos; typeBadge = `<span class="badge" style="background:#444; color:#fff;">STOCK</span>`; }
+        else if (t.type === 'LOSS') { 
+            if(prod === "CHICKEN") s_chicken -= t.kilos; else if(prod === "GIZZARDS") s_giz -= t.kilos; else s_feet -= t.kilos;
+            typeBadge = `<span class="badge badge-loss">LOSS</span>`; 
+        }
+        else if (t.type === 'STOCK') { 
+            if(prod === "CHICKEN") s_chicken += t.kilos; else if(prod === "GIZZARDS") s_giz += t.kilos; else s_feet += t.kilos;
+            typeBadge = `<span class="badge" style="background:#444; color:#fff;">STOCK</span>`; 
+        }
         
         return `<tr>
             <td>${t.date.slice(5)}</td>
-            <td>${t.client}</td>
+            <td>${t.client} <small style="color:var(--gold)">(${prod})</small></td>
             <td>${typeBadge}</td>
             <td>$${Math.abs(t.total).toFixed(2)}</td>
-            <td class="btn-grp">
-                <button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="editTx(${t.id})">EDIT</button>
-                <button class="btn-sm" style="background:#330000; color:#fff;" onclick="deleteTx(${t.id})">DEL</button>
-            </td>
+            <td class="btn-grp"><button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="editTx(${t.id})">EDIT</button></td>
         </tr>`;
     }).join("");
 
-    document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
+    document.getElementById('historyBody').innerHTML = bizData.batchHistory.sort((a,b) => b.id - a.id).map(h => `<tr><td>${h.range}</td><td>${h.days}d</td><td>${h.totalKilosSold.toFixed(1)}kg</td><td>$${h.productRevenue.toFixed(0)}</td><td>$${h.deliveryRevenue.toFixed(0)}</td><td>$${h.expenses.toFixed(0)}</td><td style="color:var(--gold); font-weight:bold;">$${h.netIncome.toFixed(2)}</td></tr>`).join("");
+
+    document.getElementById('stockVal').innerText = s_chicken.toFixed(1) + ' kg';
+    document.getElementById('gizVal').innerText = s_giz.toFixed(0) + 'g';
+    document.getElementById('feetVal').innerText = s_feet.toFixed(0) + 'g';
     document.getElementById('todaySales').innerText = '$' + prodRev.toFixed(2);
     document.getElementById('deliverySales').innerText = '$' + delRev.toFixed(2);
-    document.getElementById('todayKilos').innerText = paidK.toFixed(1) + ' kg';
-    document.getElementById('freeKilos').innerText = freeK.toFixed(1) + ' kg';
 }
 
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `perreria_v9.8_backup.json`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `perreria_v10_backup.json`; a.click();
 }
 function importData(event) {
     const reader = new FileReader();
-    reader.onload = function(e) { bizData = JSON.parse(e.target.result); save(); location.reload(); };
+    reader.onload = function(e) { bizData = JSON.parse(e.target.result); if(!bizData.batchHistory) bizData.batchHistory = []; save(); location.reload(); };
     reader.readAsText(event.target.files[0]);
 }
 function uploadLogo(event) {
@@ -295,57 +324,24 @@ function uploadLogo(event) {
     reader.onload = function() { bizData.logo = reader.result; save(); };
     reader.readAsDataURL(event.target.files[0]);
 }
+function clearHistory() { if(confirm("Clear history?")) { bizData.batchHistory = []; save(); } }
 
 function closeBatch() {
-    if (bizData.transactions.length === 0) return alert("No data to close.");
-    
-    if(confirm("CLOSE BATCH? This will archive your current stats and clear the ledger.")) {
+    if (bizData.transactions.length === 0) return alert("No data.");
+    if(confirm("CLOSE BATCH?")) {
         const sorted = [...bizData.transactions].sort((a,b) => a.id - b.id);
-        const startDate = sorted[0].date;
-        const endDate = new Date().toLocaleDateString('sv-SE');
-        const days = Math.max(1, Math.round((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)));
-        
-        let pRev = 0, dRev = 0, exp = 0, lossK = 0, freeK = 0, totalK = 0;
-        
+        let pRev = 0, dRev = 0, exp = 0, totalK = 0;
         bizData.transactions.forEach(t => {
-            if(t.type === 'SALE') {
-                pRev += (t.kilos * t.pricePerKg);
-                dRev += t.delFee;
-                totalK += t.kilos;
-                if(t.pricePerKg === 0) freeK += t.kilos;
-            } else if (t.type === 'EXPENSE') {
-                exp += Math.abs(t.total);
-            } else if (t.type === 'LOSS') {
-                lossK += t.kilos;
-                exp += Math.abs(t.total);
-            }
+            if(t.type === 'SALE') { pRev += (t.kilos * t.pricePerKg); dRev += t.delFee; if(t.product === "CHICKEN") totalK += t.kilos; }
+            else if (t.type === 'EXPENSE' || t.type === 'LOSS') { exp += Math.abs(t.total); }
         });
-
-        const net = (pRev + dRev) - exp;
-
-        const summary = {
-            id: Date.now(),
-            range: `${startDate} to ${endDate}`,
-            days: days,
-            productRevenue: pRev,
-            deliveryRevenue: dRev,
-            expenses: exp,
-            freeKilos: freeK,
-            totalKilosSold: totalK,
-            netIncome: net
-        };
-
-        if(!bizData.batchHistory) bizData.batchHistory = [];
+        const summary = { id: Date.now(), range: `${sorted[0].date.slice(5)} to ${new Date().toLocaleDateString('sv-SE').slice(5)}`, days: Math.max(1, Math.round((new Date() - new Date(sorted[0].date)) / 86400000)), productRevenue: pRev, deliveryRevenue: dRev, expenses: exp, totalKilosSold: totalK, netIncome: (pRev + dRev) - exp };
         bizData.batchHistory.push(summary);
-        
-        // Final message with all your requirements
-        alert(`BATCH CLOSED\n\nPeriod: ${days} days\nTotal Kilos Sold: ${totalK}kg\nProduct Revenue: $${pRev}\nDelivery Revenue: $${dRev}\nExpenses/Losses: $${exp}\nFree Kilos (Gifts): ${freeK}kg\n------------------\nNET INCOME: $${net}`);
-
         bizData.transactions = [];
         save();
+        alert("Batch Saved.");
     }
 }
-
 render();
 </script>
 </body>
