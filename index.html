@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V8.6 RESTORED</title>
+<title>La Perrería Gourmet PV – Version 8.7</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
-  body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+  body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 120px; }
   
   header { padding:30px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
   .logo-upload-zone { cursor: pointer; max-width: 200px; margin: auto; border: 2px dashed var(--gold); padding: 15px; border-radius: 15px; }
@@ -40,7 +40,6 @@
   .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); }
 
   .btn-sm { padding: 8px 12px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: 900; border: none; text-transform: uppercase; margin-right: 5px; }
-  .btn-edit-sm { background: #333; color: var(--gold); border: 1px solid var(--gold); }
   .btn-del-sm { background: var(--danger); color: #fff; }
 
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
@@ -49,6 +48,7 @@
   input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
   
   .history-card { background: #1a1a1a; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--gold); }
+  footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #333; padding: 10px; text-align: center; color: #555; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -92,6 +92,8 @@
     <div id="historyContent"></div>
   </div>
 </main>
+
+<footer>LA PERRERÍA GOURMET PV – VERSION 8.7</footer>
 
 <!-- SALE MODAL RESTORED -->
 <div id="saleModal" class="modal"><div class="sheet">
@@ -139,9 +141,9 @@
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v8_6") || '{"transactions":[], "logo": null, "history": []}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v8_7") || '{"transactions":[], "logo": null, "history": []}');
 
-function save() { localStorage.setItem("perreria_v8_6", JSON.stringify(bizData)); render(); }
+function save() { localStorage.setItem("perreria_v8_7", JSON.stringify(bizData)); render(); }
 
 function uploadLogo(event) {
     const reader = new FileReader();
@@ -262,7 +264,7 @@ function render() {
 
     if(bizData.history.length > 0) {
         document.getElementById('batchHistorySection').style.display = "block";
-        document.getElementById('historyContent').innerHTML = bizData.history.map(h => `<div class="history-card"><strong>Closed: ${h.end}</strong><br>Kilos Sold: ${h.kilos}kg | Expenses: $${h.expenses} | <strong>Net Profit: $${h.net}</strong></div>`).join("");
+        document.getElementById('historyContent').innerHTML = bizData.history.map(h => `<div class="history-card"><strong>Batch Ended: ${h.end}</strong><br>Kilos Sold: ${h.kilos}kg | Batch Expenses: $${h.expenses}<br><strong>BATCH NET PROFIT: $${h.net}</strong></div>`).join("");
     }
 }
 render();
