@@ -5,106 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>La Perrería Gourmet PV – V11.0</title>
 <style>
-  :root { --gold: #d4af37; --bg: #000; --card-bg: #111; --text: #fff; --danger: #ff4444; --success: #25D366; }
-  body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 120px; }
-  header { padding:20px; border-bottom: 2px solid var(--gold); text-align: center; background: #000; }
+  :root { --gold: #d4af37; --bg: #000; --card-bg: #111; --text: #fff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; }
+  body { margin:0; font-family: sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+  header { padding:20px; border-bottom: 2px solid var(--gold); text-align: center; }
   main { padding:15px; max-width:1000px; margin:auto; }
   .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--card-bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
-  .stat-val { font-size: 16px; font-weight: bold; margin-top: 5px; }
-  .action-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-  .btn { padding: 12px 16px; border-radius: 6px; border:none; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; }
+  .stat-card { background: var(--card-bg); padding: 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
+  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: bold; }
+  .stat-val { font-size: 14px; font-weight: bold; }
+  .neg-stock { color: var(--danger); }
+  .action-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .btn { padding: 10px 15px; border-radius: 4px; border:none; font-weight: bold; cursor: pointer; font-size: 11px; }
   .btn-gold { background: var(--gold); color: #000; }
-  .btn-danger { background: #600; color: #fff; border: 1px solid var(--danger); }
-  .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; }
-  th { color: #888; text-align: left; padding: 12px; border-bottom: 1px solid #333; font-size: 10px; text-transform: uppercase; }
-  td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
-  .modal { position: fixed; inset:0; background: rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
-  .sheet { background: #080808; padding: 25px; border: 2px solid var(--gold); border-radius: 15px; width:100%; max-width: 450px; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); }
-  input, select { width:100%; padding:12px; margin: 10px 0; background:#1a1a1a; color:#fff; border:1px solid #444; border-radius:6px; font-size: 16px; }
-  .summary-line { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #222; }
-  .batch-header { background: #1a1a1a; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid var(--gold); text-align: center; font-size: 12px; }
+  .btn-danger { background: #400; color: #fff; }
+  .card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { color: #888; text-align: left; padding: 10px; border-bottom: 1px solid #333; }
+  td { padding: 10px; border-bottom: 1px solid #222; }
+  .modal { position: fixed; inset:0; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
+  .sheet { background: #000; padding: 20px; border: 2px solid var(--gold); border-radius: 12px; width:100%; max-width: 400px; }
+  input, select { width:100%; padding:10px; margin: 8px 0; background:#222; color:#fff; border:1px solid #444; border-radius:4px; }
+  .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #444; padding-bottom: 5px; }
 </style>
 </head>
 <body>
 
 <header>
-    <h1 style="color:var(--gold); margin:0; font-size: 22px;">LA PERRERÍA GOURMET</h1>
-    <div id="batchInfo" class="batch-header">Calculating Batch Span...</div>
+    <h2 style="color:var(--gold); margin:0;">LA PERRERÍA GOURMET PV</h2>
+    <small id="batchDateLabel"></small>
 </header>
 
 <main>
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Chicken Stock</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
-    <div class="stat-card"><div class="stat-label">Gizzards Stock</div><div id="gizVal" class="stat-val">0 g</div></div>
-    <div class="stat-card" style="border-left-color: var(--success);"><div class="stat-label">Batch Net</div><div id="cashVal" class="stat-val">$0</div></div>
+    <div class="stat-card"><div class="stat-label">Chicken Left</div><div id="stockVal" class="stat-val">0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Gizzards Left</div><div id="gizVal" class="stat-val">0 g</div></div>
+    <div class="stat-card"><div class="stat-label">Current Cash</div><div id="cashVal" class="stat-val">$0</div></div>
   </div>
 
   <div class="action-bar">
-    <button class="btn btn-gold" onclick="openModal('saleModal')">+ Order</button>
-    <button class="btn" style="background:#222; color:var(--gold); border: 1px solid var(--gold);" onclick="openModal('stockModal')">+ Shipment</button>
-    <button class="btn btn-danger" onclick="calculateShipmentSummary()">Close Shipment Batch</button>
+    <button class="btn btn-gold" onclick="openModal('saleModal')">+ NEW ORDER</button>
+    <button class="btn" style="background:#333; color:#fff;" onclick="openModal('stockModal')">+ ADD STOCK</button>
+    <button class="btn btn-danger" onclick="calculateBatchSummary()">CLOSE BATCH</button>
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0; color:var(--gold); font-size: 14px;">ACTIVE SHIPMENT LEDGER</h3>
+    <h4 style="margin-top:0; color:var(--gold);">ACTIVE LEDGER</h4>
     <div style="overflow-x:auto;">
       <table>
-        <thead><tr><th>Date</th><th>Client/Source</th><th>Qty</th><th>Net</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Client</th><th>Qty</th><th>Total</th><th>Status</th><th>X</th></tr></thead>
         <tbody id="ledgerBody"></tbody>
       </table>
     </div>
   </div>
 </main>
 
-<!-- SHIPMENT SUMMARY MODAL -->
+<!-- BATCH SUMMARY MODAL -->
 <div id="batchSummaryModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin-top:0;">BATCH PERFORMANCE</h2>
+    <h3 style="color:var(--gold);">BATCH REPORT</h3>
     <div id="summaryContent"></div>
-    <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
-    <p style="font-size:12px; color:#aaa; line-height: 1.4;">Finalizing will archive these transactions and carry the leftover grams/kilos into the next shipment entry.</p>
-    <button class="btn btn-gold" style="width:100%; padding: 15px;" onclick="confirmBatchClose()">FINALIZE & START NEW BATCH</button>
-    <button class="btn" style="width:100%; margin-top:10px; color:#666;" onclick="closeModal('batchSummaryModal')">CANCEL</button>
+    <hr style="border:0; border-top:1px solid var(--gold);">
+    <p style="font-size:11px; color:#aaa;">Closing this batch will carry over remaining stock and archive these transactions.</p>
+    <button class="btn btn-gold" style="width:100%;" onclick="confirmBatchClose()">FINALIZE & CARRY OVER</button>
+    <button class="btn" style="width:100%; margin-top:10px; color:#999;" onclick="closeModal('batchSummaryModal')">GO BACK</button>
 </div></div>
 
 <!-- SALE MODAL -->
 <div id="saleModal" class="modal"><div class="sheet">
-    <h3 style="color:var(--gold); margin-top:0;">NEW ORDER</h3>
     <input type="hidden" id="editSId">
-    <label>Date</label><input id="sDate" type="date">
-    <label>Client Name</label><input id="sClient">
+    <label>Client</label><input id="sClient" placeholder="Name">
     <label>Product</label><select id="sProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
-    <label>Quantity (kg or grams)</label><input id="sKilos" type="number" step="0.01" inputmode="decimal">
-    <label>Price</label><input id="sPrice" type="number" inputmode="decimal">
-    <label>Delivery Fee</label><input id="sDelivery" type="number" inputmode="decimal">
-    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ORDER</button>
+    <label>Qty (kg/g)</label><input id="sKilos" type="number" step="0.1">
+    <label>Price Per Unit</label><input id="sPrice" type="number">
+    <label>Delivery</label><input id="sDelivery" type="number" value="0">
+    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ENTRY</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
 <!-- STOCK MODAL -->
 <div id="stockModal" class="modal"><div class="sheet">
-    <h3 style="color:var(--gold); margin-top:0;">NEW SHIPMENT / STOCK</h3>
-    <label>Date</label><input id="stDate" type="date">
-    <label>Product</label><select id="stProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
-    <label>Amount Received</label><input id="stKilos" type="number" step="0.01" inputmode="decimal">
-    <label>Total Shipment Cost ($)</label><input id="stCost" type="number" inputmode="decimal">
-    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveStock()">ADD STOCK</button>
+    <label>Stock Type</label><select id="stProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
+    <label>Amount Added</label><input id="stKilos" type="number" step="0.1">
+    <label>Cost of Stock ($)</label><input id="stCost" type="number">
+    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveStock()">ADD TO STOCK</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v11") || '{"transactions":[]}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v10") || '{"transactions":[], "batchHistory": []}');
 
-function save() { localStorage.setItem("perreria_v11", JSON.stringify(bizData)); render(); }
-function openModal(id) { 
-    document.getElementById(id).style.display = "flex"; 
-    const today = new Date().toLocaleDateString('sv-SE');
-    if(id === 'saleModal') document.getElementById('sDate').value = today;
-    if(id === 'stockModal') document.getElementById('stDate').value = today;
+function save() { localStorage.setItem("perreria_v10", JSON.stringify(bizData)); render(); }
+
+function openModal(id) { document.getElementById(id).style.display = "flex"; }
+function closeModal(id) { 
+    document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = "");
+    document.getElementById(id).style.display = "none"; 
 }
-function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 function saveSale() {
     const id = document.getElementById('editSId').value;
@@ -114,17 +109,18 @@ function saveSale() {
     
     const entry = {
         id: id ? parseInt(id) : Date.now(),
-        date: document.getElementById('sDate').value,
         type: 'SALE',
-        client: document.getElementById('sClient').value,
+        client: document.getElementById('sClient').value || 'Guest',
         product: document.getElementById('sProd').value,
         kilos: k,
         total: (k * p) + d,
+        status: 'PENDING',
         archived: false
     };
 
     if(id) {
         const idx = bizData.transactions.findIndex(t => t.id == id);
+        entry.status = bizData.transactions[idx].status;
         bizData.transactions[idx] = entry;
     } else { bizData.transactions.push(entry); }
     
@@ -135,19 +131,24 @@ function saveSale() {
 function saveStock() {
     bizData.transactions.push({
         id: Date.now(),
-        date: document.getElementById('stDate').value,
         type: 'STOCK',
         product: document.getElementById('stProd').value,
         kilos: parseFloat(document.getElementById('stKilos').value) || 0,
         cost: parseFloat(document.getElementById('stCost').value) || 0,
         archived: false,
-        client: 'SHIPMENT'
+        client: 'STOCK BUY'
     });
     save(); closeModal('stockModal');
 }
 
+function toggleStatus(id) {
+    const idx = bizData.transactions.findIndex(t => t.id === id);
+    bizData.transactions[idx].status = bizData.transactions[idx].status === 'PENDING' ? 'COMPLETED' : 'PENDING';
+    save();
+}
+
 function deleteTx(id) {
-    if(confirm("Delete this entry?")) {
+    if(confirm("Delete permanently?")) {
         bizData.transactions = bizData.transactions.filter(t => t.id !== id);
         save();
     }
@@ -155,60 +156,50 @@ function deleteTx(id) {
 
 function render() {
     let s_chicken = 0, s_giz = 0, cash = 0;
-    let dates = [];
     const tbody = document.getElementById('ledgerBody');
     tbody.innerHTML = "";
-
-    // Sort transactions by date
-    bizData.transactions.sort((a,b) => new Date(a.date) - new Date(b.date));
+    document.getElementById('batchDateLabel').innerText = "Batch: " + new Date().toLocaleDateString();
 
     bizData.transactions.forEach(t => {
-        const amt = parseFloat(t.kilos) || 0;
         if(t.type === 'SALE') {
-            if(t.product === "CHICKEN") s_chicken -= amt; else s_giz -= amt;
-            cash += t.total;
+            if(t.product === "CHICKEN") s_chicken -= t.kilos; else s_giz -= t.kilos;
+            if(t.status === 'COMPLETED') cash += t.total;
         } else {
-            if(t.product === "CHICKEN") s_chicken += amt; else s_giz += amt;
-            cash -= (t.cost || 0);
+            if(t.product === "CHICKEN") s_chicken += t.kilos; else s_giz += t.kilos;
+            if(!t.archived) cash -= (t.cost || 0); 
         }
 
         if(!t.archived) {
-            dates.push(new Date(t.date));
             tbody.innerHTML += `<tr>
-                <td>${t.date.slice(5)}</td>
                 <td>${t.client}</td>
-                <td>${amt}${t.product === 'CHICKEN' ? 'kg' : 'g'}</td>
-                <td>$${(t.total || -t.cost || 0).toFixed(0)}</td>
-                <td>
-                    <button onclick="deleteTx(${t.id})" style="background:none; border:none; color:var(--danger); font-weight:bold;">DELETE</button>
-                </td>
+                <td>${t.kilos}</td>
+                <td>$${(t.total || 0).toFixed(0)}</td>
+                <td><button onclick="toggleStatus(${t.id})" class="btn" style="background:${t.status==='COMPLETED'?'#040':'#440'}; font-size:9px;">${t.status || 'STOCK'}</button></td>
+                <td><button onclick="deleteTx(${t.id})" style="background:none; border:none; color:red; cursor:pointer;">✕</button></td>
             </tr>`;
         }
     });
 
-    document.getElementById('stockVal').innerText = s_chicken.toFixed(1) + ' kg';
-    document.getElementById('gizVal').innerText = s_giz.toFixed(0) + ' g';
+    const cDisp = document.getElementById('stockVal');
+    const gDisp = document.getElementById('gizVal');
+    
+    cDisp.innerText = s_chicken.toFixed(1) + ' kg';
+    cDisp.className = s_chicken < 0 ? 'stat-val neg-stock' : 'stat-val';
+    
+    gDisp.innerText = s_giz.toFixed(0) + ' g';
+    gDisp.className = s_giz < 0 ? 'stat-val neg-stock' : 'stat-val';
+    
     document.getElementById('cashVal').innerText = '$' + cash.toFixed(0);
-
-    // Update Batch Span Header
-    if(dates.length > 0) {
-        const first = new Date(Math.min(...dates)).toLocaleDateString();
-        const last = new Date(Math.max(...dates)).toLocaleDateString();
-        document.getElementById('batchInfo').innerText = `Batch Period: ${first} — ${last}`;
-    } else {
-        document.getElementById('batchInfo').innerText = "No active shipment data.";
-    }
 }
 
-function calculateShipmentSummary() {
-    let sales = 0, expenses = 0, cLeft = 0, gLeft = 0;
-    let dates = [];
+function calculateBatchSummary() {
+    let sales = 0, expenses = 0, cLeft = 0, gLeft = 0, pending = 0;
     
     bizData.transactions.forEach(t => {
         if(!t.archived) {
-            dates.push(new Date(t.date));
             if(t.type === 'SALE') {
-                sales += t.total;
+                if(t.status === 'COMPLETED') sales += t.total;
+                else pending++;
                 if(t.product === "CHICKEN") cLeft -= t.kilos; else gLeft -= t.kilos;
             } else {
                 expenses += (t.cost || 0);
@@ -217,67 +208,44 @@ function calculateShipmentSummary() {
         }
     });
 
-    if(dates.length === 0) return alert("No active data to close.");
-
-    const first = new Date(Math.min(...dates)).toLocaleDateString();
-    const last = new Date(Math.max(...dates)).toLocaleDateString();
-
     document.getElementById('summaryContent').innerHTML = `
-        <div class="summary-line"><span>Batch Duration:</span> <strong>${first} to ${last}</strong></div>
-        <div class="summary-line"><span>Total Sales:</span> <span>$${sales.toFixed(2)}</span></div>
-        <div class="summary-line"><span>Total Expenses:</span> <span>-$${expenses.toFixed(2)}</span></div>
-        <div class="summary-line" style="color:var(--gold); font-size: 18px; font-weight:bold; border-top: 2px solid #333; padding-top:10px;">
-            <span>NET PROFIT:</span> <span>$${(sales - expenses).toFixed(2)}</span>
-        </div>
+        <div class="summary-line"><span>Gross (Completed):</span> <span>$${sales}</span></div>
+        <div class="summary-line"><span>Expenses:</span> <span>-$${expenses}</span></div>
+        <div class="summary-line" style="color:var(--success); font-weight:bold;"><span>Net:</span> <span>$${sales - expenses}</span></div>
+        <div class="summary-line" style="color:var(--pending);"><span>Pending Orders:</span> <span>${pending}</span></div>
         <br>
-        <div class="summary-line"><span>Leftover Chicken:</span> <span>${cLeft.toFixed(2)} kg</span></div>
-        <div class="summary-line"><span>Leftover Gizzards:</span> <span>${gLeft.toFixed(0)} g</span></div>
+        <div class="summary-line"><span>Carry Over Chicken:</span> <span>${cLeft.toFixed(1)} kg</span></div>
+        <div class="summary-line"><span>Carry Over Gizzards:</span> <span>${gLeft.toFixed(0)} g</span></div>
     `;
     openModal('batchSummaryModal');
 }
 
 function confirmBatchClose() {
+    const hasPending = bizData.transactions.some(t => !t.archived && t.status === 'PENDING');
+    if(hasPending && !confirm("You have PENDING orders. They won't be counted in profit. Close anyway?")) return;
+
     let cLeft = 0, gLeft = 0;
-    
-    // 1. Calculate the final leftovers before archiving
     bizData.transactions.forEach(t => {
-        const amt = parseFloat(t.kilos) || 0;
         if(t.type === 'SALE') {
-            if(t.product === "CHICKEN") cLeft -= amt; else gLeft -= amt;
+            if(t.product === "CHICKEN") cLeft -= t.kilos; else gLeft -= t.kilos;
         } else {
-            if(t.product === "CHICKEN") cLeft += amt; else gLeft += amt;
+            if(t.product === "CHICKEN") cLeft += t.kilos; else gLeft += t.kilos;
         }
     });
 
-    // 2. Archive all current items
     bizData.transactions.forEach(t => t.archived = true);
 
-    // 3. Carry over leftovers as new "Opening Stock" (cost is 0 for carry over)
-    const now = new Date().toLocaleDateString('sv-SE');
+    const now = Date.now();
     bizData.transactions.push({
-        id: Date.now(),
-        date: now,
-        type: 'STOCK',
-        product: 'CHICKEN',
-        kilos: cLeft,
-        cost: 0,
-        archived: false,
-        client: 'CARRY FROM PREV BATCH'
+        id: now, type: 'STOCK', product: 'CHICKEN', kilos: cLeft, cost: 0, archived: false, client: 'CARRY OVER'
     });
     bizData.transactions.push({
-        id: Date.now() + 1,
-        date: now,
-        type: 'STOCK',
-        product: 'GIZZARDS',
-        kilos: gLeft,
-        cost: 0,
-        archived: false,
-        client: 'CARRY FROM PREV BATCH'
+        id: now + 1, type: 'STOCK', product: 'GIZZARDS', kilos: gLeft, cost: 0, archived: false, client: 'CARRY OVER'
     });
 
     save();
     closeModal('batchSummaryModal');
-    alert("Batch Finalized. History saved and leftovers carried forward.");
+    alert("Batch Closed successfully.");
 }
 
 render();
