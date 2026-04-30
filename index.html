@@ -3,103 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V11.0</title>
+<title>La Perrería Gourmet PV – V10.8</title>
 <style>
-  :root { --gold: #d4af37; --bg: #000; --card-bg: #111; --text: #fff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; }
-  body { margin:0; font-family: sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
-  header { padding:20px; border-bottom: 2px solid var(--gold); text-align: center; }
-  main { padding:15px; max-width:1000px; margin:auto; }
-  .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--card-bg); padding: 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
-  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: bold; }
-  .stat-val { font-size: 14px; font-weight: bold; }
-  .neg-stock { color: var(--danger); }
-  .action-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .btn { padding: 10px 15px; border-radius: 4px; border:none; font-weight: bold; cursor: pointer; font-size: 11px; }
+  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
+  body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 180px; }
+  header { padding:30px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
+  #mainLogo { max-height: 100px; max-width: 100%; display: block; margin: auto; margin-bottom: 10px; }
+  main { padding:20px; max-width:1100px; margin:auto; }
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 25px; }
+  .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); }
+  .stat-label { font-size: 8px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
+  .stat-val { font-size: 16px; font-weight: 700; color: #fff; margin-top: 4px; }
+  .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+  .btn { padding: 12px 18px; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
   .btn-gold { background: var(--gold); color: #000; }
-  .btn-danger { background: #400; color: #fff; }
-  .card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  th { color: #888; text-align: left; padding: 10px; border-bottom: 1px solid #333; }
-  td { padding: 10px; border-bottom: 1px solid #222; }
-  .modal { position: fixed; inset:0; background: rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px; }
-  .sheet { background: #000; padding: 20px; border: 2px solid var(--gold); border-radius: 12px; width:100%; max-width: 400px; }
-  input, select { width:100%; padding:10px; margin: 8px 0; background:#222; color:#fff; border:1px solid #444; border-radius:4px; }
-  .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #444; padding-bottom: 5px; }
+  .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
+  .btn-wa-action { background: var(--success); color: #000; width: 100%; margin-top: 15px; border-radius: 30px; font-size: 14px; font-weight: bold; }
+  .btn-sm { padding: 6px 10px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; background: #333; color: #fff; }
+  .card { background: var(--card-bg); border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+  table { width: 100%; border-collapse: collapse; min-width: 650px; }
+  th { text-align: left; color: #aaa; padding: 12px; border-bottom: 1px solid #444; font-size: 10px; text-transform: uppercase; }
+  td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
+  .badge { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: none; cursor: pointer; }
+  .badge-pending { background: #332b00; color: var(--pending); border: 1px solid var(--pending); }
+  .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+  .sheet { background: #0a0a0a; padding: 25px; border-radius: 12px; border: 2px solid var(--gold); width: 100%; max-width: 450px; overflow-y: auto; max-height: 85vh; }
+  label { font-size: 10px; color: var(--gold); font-weight: 900; display: block; margin-top: 10px; text-transform: uppercase; }
+  input, select { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+  footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #333; padding: 15px; text-align: center; color: var(--gold); font-size: 11px; z-index: 500; }
+  .btn-group { display: flex; gap: 5px; }
 </style>
 </head>
 <body>
 
 <header>
-    <h2 style="color:var(--gold); margin:0;">LA PERRERÍA GOURMET PV</h2>
-    <small id="batchDateLabel"></small>
+  <img id="mainLogo" src="" style="display:none;">
+  <input type="file" id="logoInput" hidden accept="image/*" onchange="uploadLogo(event)">
+  <button class="btn btn-sm" onclick="document.getElementById('logoInput').click()">SET LOGO</button>
 </header>
 
 <main>
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Chicken Left</div><div id="stockVal" class="stat-val">0 kg</div></div>
-    <div class="stat-card"><div class="stat-label">Gizzards Left</div><div id="gizVal" class="stat-val">0 g</div></div>
-    <div class="stat-card"><div class="stat-label">Current Cash</div><div id="cashVal" class="stat-val">$0</div></div>
+    <div class="stat-card"><div class="stat-label">Stock Chicken</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Stock Gizzards</div><div id="gizVal" class="stat-val">0g</div></div>
+    <div class="stat-card"><div class="stat-label">Daily Rev</div><div id="todaySales" class="stat-val">$0</div></div>
   </div>
 
   <div class="action-bar">
-    <button class="btn btn-gold" onclick="openModal('saleModal')">+ NEW ORDER</button>
-    <button class="btn" style="background:#333; color:#fff;" onclick="openModal('stockModal')">+ ADD STOCK</button>
-    <button class="btn btn-danger" onclick="calculateBatchSummary()">CLOSE BATCH</button>
+    <button class="btn btn-gold" onclick="openModal('saleModal')">New Order</button>
+    <button class="btn btn-outline" onclick="openModal('stockModal')">+ Stock</button>
+    <button class="btn" style="background:#440000; color:white;" onclick="closeBatch()">Close Batch</button>
+    <button class="btn btn-sm" onclick="exportData()">Backup</button>
   </div>
 
   <div class="card">
-    <h4 style="margin-top:0; color:var(--gold);">ACTIVE LEDGER</h4>
     <div style="overflow-x:auto;">
       <table>
-        <thead><tr><th>Client</th><th>Qty</th><th>Total</th><th>Status</th><th>X</th></tr></thead>
+        <thead><tr><th>Date</th><th>Detail</th><th>Status</th><th>Total</th><th>Actions</th></tr></thead>
         <tbody id="ledgerBody"></tbody>
       </table>
     </div>
   </div>
 </main>
 
-<!-- BATCH SUMMARY MODAL -->
-<div id="batchSummaryModal" class="modal"><div class="sheet">
-    <h3 style="color:var(--gold);">BATCH REPORT</h3>
-    <div id="summaryContent"></div>
-    <hr style="border:0; border-top:1px solid var(--gold);">
-    <p style="font-size:11px; color:#aaa;">Closing this batch will carry over remaining stock and archive these transactions.</p>
-    <button class="btn btn-gold" style="width:100%;" onclick="confirmBatchClose()">FINALIZE & CARRY OVER</button>
-    <button class="btn" style="width:100%; margin-top:10px; color:#999;" onclick="closeModal('batchSummaryModal')">GO BACK</button>
-</div></div>
+<footer>LA PERRERÍA GOURMET PV – V10.8</footer>
 
-<!-- SALE MODAL -->
+<!-- MODALS -->
 <div id="saleModal" class="modal"><div class="sheet">
+    <h2 style="color:var(--gold); margin:0;">ORDER ENTRY</h2>
     <input type="hidden" id="editSId">
-    <label>Client</label><input id="sClient" placeholder="Name">
+    <label>Date</label><input id="sDate" type="date">
+    <label>Client</label><input id="sClient">
     <label>Product</label><select id="sProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
-    <label>Qty (kg/g)</label><input id="sKilos" type="number" step="0.1">
-    <label>Price Per Unit</label><input id="sPrice" type="number">
-    <label>Delivery</label><input id="sDelivery" type="number" value="0">
-    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ENTRY</button>
+    <label>Kilos/Grams</label><input id="sKilos" type="number" step="0.1" inputmode="decimal">
+    <label>Price</label><input id="sPrice" type="number" inputmode="decimal">
+    <label>Delivery</label><input id="sDelivery" type="number" inputmode="decimal">
+    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ORDER</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
-<!-- STOCK MODAL -->
 <div id="stockModal" class="modal"><div class="sheet">
-    <label>Stock Type</label><select id="stProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
-    <label>Amount Added</label><input id="stKilos" type="number" step="0.1">
-    <label>Cost of Stock ($)</label><input id="stCost" type="number">
-    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveStock()">ADD TO STOCK</button>
+    <h2 style="color:var(--gold); margin:0;">STOCK ENTRY</h2>
+    <label>Product</label><select id="stProd"><option value="CHICKEN">CHICKEN</option><option value="GIZZARDS">GIZZARDS</option></select>
+    <label>Amount</label><input id="stKilos" type="number" step="0.1" inputmode="decimal">
+    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveStock()">ADD STOCK</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v10") || '{"transactions":[], "batchHistory": []}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v9") || '{"transactions":[], "logo": null}');
 
-function save() { localStorage.setItem("perreria_v10", JSON.stringify(bizData)); render(); }
+function save() { localStorage.setItem("perreria_v9", JSON.stringify(bizData)); render(); }
 
-function openModal(id) { document.getElementById(id).style.display = "flex"; }
-function closeModal(id) { 
-    document.querySelectorAll('input:not([type="hidden"])').forEach(i => i.value = "");
-    document.getElementById(id).style.display = "none"; 
+function openModal(id) { 
+    document.getElementById('editSId').value = ""; // Clear edit ID
+    document.getElementById(id).style.display = "flex"; 
+    document.getElementById('sDate').value = new Date().toLocaleDateString('sv-SE');
 }
+
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 function saveSale() {
     const id = document.getElementById('editSId').value;
@@ -109,42 +112,49 @@ function saveSale() {
     
     const entry = {
         id: id ? parseInt(id) : Date.now(),
+        date: document.getElementById('sDate').value,
         type: 'SALE',
-        client: document.getElementById('sClient').value || 'Guest',
+        client: document.getElementById('sClient').value,
         product: document.getElementById('sProd').value,
         kilos: k,
+        pricePerKg: p,
+        delFee: d,
         total: (k * p) + d,
-        status: 'PENDING',
+        status: id ? (bizData.transactions.find(t => t.id == id).status) : 'PENDING',
         archived: false
     };
 
     if(id) {
         const idx = bizData.transactions.findIndex(t => t.id == id);
-        entry.status = bizData.transactions[idx].status;
         bizData.transactions[idx] = entry;
-    } else { bizData.transactions.push(entry); }
-    
-    document.getElementById('editSId').value = "";
+    } else {
+        bizData.transactions.push(entry);
+    }
     save(); closeModal('saleModal');
 }
 
 function saveStock() {
     bizData.transactions.push({
         id: Date.now(),
+        date: new Date().toLocaleDateString('sv-SE'),
         type: 'STOCK',
         product: document.getElementById('stProd').value,
         kilos: parseFloat(document.getElementById('stKilos').value) || 0,
-        cost: parseFloat(document.getElementById('stCost').value) || 0,
-        archived: false,
-        client: 'STOCK BUY'
+        archived: false
     });
     save(); closeModal('stockModal');
 }
 
-function toggleStatus(id) {
-    const idx = bizData.transactions.findIndex(t => t.id === id);
-    bizData.transactions[idx].status = bizData.transactions[idx].status === 'PENDING' ? 'COMPLETED' : 'PENDING';
-    save();
+function editTx(id) {
+    const t = bizData.transactions.find(x => x.id == id);
+    if(!t) return;
+    document.getElementById('editSId').value = t.id;
+    document.getElementById('sClient').value = t.client || "";
+    document.getElementById('sKilos').value = t.kilos || 0;
+    document.getElementById('sPrice').value = t.pricePerKg || 0;
+    document.getElementById('sDelivery').value = t.delFee || 0;
+    document.getElementById('sProd').value = t.product || "CHICKEN";
+    openModal('saleModal');
 }
 
 function deleteTx(id) {
@@ -154,98 +164,75 @@ function deleteTx(id) {
     }
 }
 
+function toggleStatus(id) {
+    const idx = bizData.transactions.findIndex(t => t.id === id);
+    bizData.transactions[idx].status = bizData.transactions[idx].status === 'PENDING' ? 'COMPLETED' : 'PENDING';
+    save();
+}
+
 function render() {
-    let s_chicken = 0, s_giz = 0, cash = 0;
+    let s_chicken = 0, s_giz = 0, rev = 0;
+    const logoImg = document.getElementById('mainLogo');
+    if(bizData.logo) { logoImg.src = bizData.logo; logoImg.style.display = "block"; }
+
     const tbody = document.getElementById('ledgerBody');
     tbody.innerHTML = "";
-    document.getElementById('batchDateLabel').innerText = "Batch: " + new Date().toLocaleDateString();
 
     bizData.transactions.forEach(t => {
+        // Calculate Stock
+        const amt = parseFloat(t.kilos) || 0;
         if(t.type === 'SALE') {
-            if(t.product === "CHICKEN") s_chicken -= t.kilos; else s_giz -= t.kilos;
-            if(t.status === 'COMPLETED') cash += t.total;
+            if(t.product === "CHICKEN") s_chicken -= amt; else s_giz -= amt;
+            if(t.status === 'COMPLETED') rev += t.total;
         } else {
-            if(t.product === "CHICKEN") s_chicken += t.kilos; else s_giz += t.kilos;
-            if(!t.archived) cash -= (t.cost || 0); 
+            if(t.product === "CHICKEN") s_chicken += amt; else s_giz += amt;
         }
 
+        // Show in Ledger if NOT archived
         if(!t.archived) {
-            tbody.innerHTML += `<tr>
-                <td>${t.client}</td>
-                <td>${t.kilos}</td>
+            const row = `<tr>
+                <td>${t.date.slice(5)}</td>
+                <td>${t.client || 'STOCK'}</td>
+                <td><button class="badge ${t.status==='COMPLETED'?'badge-done':'badge-pending'}" onclick="toggleStatus(${t.id})">${t.status || t.type}</button></td>
                 <td>$${(t.total || 0).toFixed(0)}</td>
-                <td><button onclick="toggleStatus(${t.id})" class="btn" style="background:${t.status==='COMPLETED'?'#040':'#440'}; font-size:9px;">${t.status || 'STOCK'}</button></td>
-                <td><button onclick="deleteTx(${t.id})" style="background:none; border:none; color:red; cursor:pointer;">✕</button></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn-sm" onclick="editTx(${t.id})">EDIT</button>
+                        <button class="btn-sm" style="color:var(--danger)" onclick="deleteTx(${t.id})">DEL</button>
+                    </div>
+                </td>
             </tr>`;
+            tbody.innerHTML += row;
         }
     });
 
-    const cDisp = document.getElementById('stockVal');
-    const gDisp = document.getElementById('gizVal');
-    
-    cDisp.innerText = s_chicken.toFixed(1) + ' kg';
-    cDisp.className = s_chicken < 0 ? 'stat-val neg-stock' : 'stat-val';
-    
-    gDisp.innerText = s_giz.toFixed(0) + ' g';
-    gDisp.className = s_giz < 0 ? 'stat-val neg-stock' : 'stat-val';
-    
-    document.getElementById('cashVal').innerText = '$' + cash.toFixed(0);
+    document.getElementById('stockVal').innerText = s_chicken.toFixed(1) + ' kg';
+    document.getElementById('gizVal').innerText = s_giz.toFixed(0) + 'g';
+    document.getElementById('todaySales').innerText = '$' + rev.toFixed(0);
 }
 
-function calculateBatchSummary() {
-    let sales = 0, expenses = 0, cLeft = 0, gLeft = 0, pending = 0;
-    
-    bizData.transactions.forEach(t => {
-        if(!t.archived) {
-            if(t.type === 'SALE') {
-                if(t.status === 'COMPLETED') sales += t.total;
-                else pending++;
-                if(t.product === "CHICKEN") cLeft -= t.kilos; else gLeft -= t.kilos;
-            } else {
-                expenses += (t.cost || 0);
-                if(t.product === "CHICKEN") cLeft += t.kilos; else gLeft += t.kilos;
-            }
-        }
-    });
-
-    document.getElementById('summaryContent').innerHTML = `
-        <div class="summary-line"><span>Gross (Completed):</span> <span>$${sales}</span></div>
-        <div class="summary-line"><span>Expenses:</span> <span>-$${expenses}</span></div>
-        <div class="summary-line" style="color:var(--success); font-weight:bold;"><span>Net:</span> <span>$${sales - expenses}</span></div>
-        <div class="summary-line" style="color:var(--pending);"><span>Pending Orders:</span> <span>${pending}</span></div>
-        <br>
-        <div class="summary-line"><span>Carry Over Chicken:</span> <span>${cLeft.toFixed(1)} kg</span></div>
-        <div class="summary-line"><span>Carry Over Gizzards:</span> <span>${gLeft.toFixed(0)} g</span></div>
-    `;
-    openModal('batchSummaryModal');
+function closeBatch() {
+    const count = bizData.transactions.filter(t => t.status === 'COMPLETED' && !t.archived).length;
+    if(confirm(`Archive ${count} COMPLETED orders? Pending orders will stay visible.`)) {
+        bizData.transactions.forEach(t => {
+            if(t.status === 'COMPLETED') t.archived = true;
+        });
+        save();
+    }
 }
 
-function confirmBatchClose() {
-    const hasPending = bizData.transactions.some(t => !t.archived && t.status === 'PENDING');
-    if(hasPending && !confirm("You have PENDING orders. They won't be counted in profit. Close anyway?")) return;
+function exportData() {
+    const blob = new Blob([JSON.stringify(bizData)], {type: "application/json"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Perreria_Backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+}
 
-    let cLeft = 0, gLeft = 0;
-    bizData.transactions.forEach(t => {
-        if(t.type === 'SALE') {
-            if(t.product === "CHICKEN") cLeft -= t.kilos; else gLeft -= t.kilos;
-        } else {
-            if(t.product === "CHICKEN") cLeft += t.kilos; else gLeft += t.kilos;
-        }
-    });
-
-    bizData.transactions.forEach(t => t.archived = true);
-
-    const now = Date.now();
-    bizData.transactions.push({
-        id: now, type: 'STOCK', product: 'CHICKEN', kilos: cLeft, cost: 0, archived: false, client: 'CARRY OVER'
-    });
-    bizData.transactions.push({
-        id: now + 1, type: 'STOCK', product: 'GIZZARDS', kilos: gLeft, cost: 0, archived: false, client: 'CARRY OVER'
-    });
-
-    save();
-    closeModal('batchSummaryModal');
-    alert("Batch Closed successfully.");
+function uploadLogo(event) {
+    const reader = new FileReader();
+    reader.onload = function() { bizData.logo = reader.result; save(); };
+    reader.readAsDataURL(event.target.files[0]);
 }
 
 render();
