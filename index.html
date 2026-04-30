@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V8.3</title>
+<title>La Perrería Gourmet PV – V8.4</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
@@ -89,11 +89,11 @@
     <button class="btn btn-gold" onclick="exportData()">💾 BACKUP DATA</button>
     <button class="btn btn-outline" style="margin-left:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE</button>
     <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-    <div class="version-tag">VERSION 8.3 • REVENUE LOGIC FIX</div>
+    <div class="version-tag">VERSION 8.4 • REVENUE SYNC FIX</div>
   </div>
 </main>
 
-<!-- MODALS REMAIN THE SAME -->
+<!-- MODALS -->
 <div id="saleModal" class="modal"><div class="sheet">
     <h2 id="saleTitle" style="color:var(--gold); margin-top:0;">NEW ORDER</h2>
     <input type="hidden" id="editId">
@@ -138,9 +138,13 @@
 </div></div>
 
 <script>
+// Data key remains same for continuity
 let bizData = JSON.parse(localStorage.getItem("perreria_v7_7") || '{"transactions":[], "logo": null}');
 
-function save() { localStorage.setItem("perreria_v7_7", JSON.stringify(bizData)); render(); }
+function save() { 
+    localStorage.setItem("perreria_v7_7", JSON.stringify(bizData)); 
+    render(); 
+}
 
 function uploadLogo(event) {
     const reader = new FileReader();
@@ -151,7 +155,7 @@ function uploadLogo(event) {
 function openModal(id) { 
     document.getElementById(id).style.display = "flex"; 
     if(id === 'saleModal' && !document.getElementById('editId').value) {
-        document.getElementById('sDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('sDate').value = new Date().toLocaleDateString('sv-SE');
         document.getElementById('sDelivery').value = 0;
         updateReceipt();
     }
@@ -176,7 +180,7 @@ function updateReceipt() {
 function toggleStatus(id) {
     const tx = bizData.transactions.find(t => t.id === id);
     if(tx && tx.type === 'SALE') {
-        tx.status = tx.status === 'COMPLETED' ? 'PENDING' : 'COMPLETED';
+        tx.status = (tx.status === 'COMPLETED') ? 'PENDING' : 'COMPLETED';
         save();
     }
 }
@@ -253,27 +257,42 @@ function editTx(id) {
 function deleteTx(id) { if(confirm("Delete record?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
 
 function render() {
-    const today = new Date().toISOString().slice(0,10);
-    let dK = 0, dS = 0, stock = 0;
-    if(bizData.logo) { document.getElementById('mainLogo').src = bizData.logo; document.getElementById('mainLogo').style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
+    // FORCE TODAY'S DATE FORMAT TO MATCH INPUT
+    const today = new Date().toLocaleDateString('sv-SE'); 
+    
+    let currentStock = 0;
+    let revenueToday = 0;
+    let kilosToday = 0;
+
+    if(bizData.logo) { 
+        document.getElementById('mainLogo').src = bizData.logo; 
+        document.getElementById('mainLogo').style.display = "block"; 
+        document.getElementById('logoLabel').style.display = "none"; 
+    }
     
     const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+    
     document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
         if(t.type === 'SALE') {
-            // STOCK LOGIC: Subtract all sales (pending or done) to see what's actually left
-            stock -= t.kilos; 
+            // STOCK: Subtract all kilos from stock immediately regardless of status
+            currentStock -= t.kilos; 
             
-            // REVENUE LOGIC: Only count if Today AND Completed
-            if(t.date === today && t.status === 'COMPLETED') { 
-                dK += t.kilos; 
-                dS += t.total; 
+            // REVENUE: Check logic precisely
+            const isToday = (t.date === today);
+            const isCompleted = (t.status === 'COMPLETED');
+
+            if(isToday && isCompleted) { 
+                revenueToday += t.total; 
+                kilosToday += t.kilos; 
             }
 
-            const statusClass = t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending';
+            const statusClass = (t.status === 'COMPLETED') ? 'badge-done' : 'badge-pending';
+            const displayStatus = t.status || 'PENDING';
+
             return `<tr>
                 <td style="color:#888; font-size:11px;">${t.date.slice(5)}</td>
                 <td><strong>${t.client}</strong></td>
-                <td><button class="badge ${statusClass}" onclick="toggleStatus(${t.id})">${t.status || 'PENDING'}</button></td>
+                <td><button class="badge ${statusClass}" onclick="toggleStatus(${t.id})">${displayStatus}</button></td>
                 <td style="color:var(--success)">$${t.total.toFixed(0)}</td>
                 <td class="row-actions">
                     <button class="btn-sm btn-edit-sm" onclick="editTx(${t.id})">Edit</button>
@@ -281,7 +300,7 @@ function render() {
                 </td>
             </tr>`;
         } else {
-            if(t.type === 'STOCK') stock += t.kilos;
+            if(t.type === 'STOCK') currentStock += t.kilos;
             return `<tr>
                 <td style="color:#888; font-size:11px;">${t.date.slice(5)}</td>
                 <td><span style="font-size:10px; color:#666">${t.type}</span><br>${t.client}</td>
@@ -294,9 +313,10 @@ function render() {
             </tr>`;
         }
     }).join("");
-    document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
-    document.getElementById('todaySales').innerText = '$' + dS.toFixed(2);
-    document.getElementById('todayKilos').innerText = dK.toFixed(1) + ' kg';
+
+    document.getElementById('stockVal').innerText = currentStock.toFixed(1) + ' kg';
+    document.getElementById('todaySales').innerText = '$' + revenueToday.toFixed(2);
+    document.getElementById('todayKilos').innerText = kilosToday.toFixed(1) + ' kg';
 }
 
 function sendWhatsApp() {
@@ -321,6 +341,7 @@ function importData(event) {
     reader.readAsText(event.target.files[0]);
 }
 
+// Initial render
 render();
 </script>
 </body>
