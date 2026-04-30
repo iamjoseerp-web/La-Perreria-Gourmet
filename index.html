@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V8.1</title>
+<title>La Perrería Gourmet PV – V8.3</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
@@ -32,8 +32,7 @@
   th { text-align: left; color: #aaa; padding: 12px; border-bottom: 1px solid #444; font-size: 10px; text-transform: uppercase; }
   td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
 
-  /* STATUS BADGES */
-  .badge { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; }
+  .badge { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; min-width: 90px; }
   .badge-pending { background: #332b00; color: var(--pending); border: 1px solid var(--pending); }
   .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); }
 
@@ -65,9 +64,9 @@
 
 <main>
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Stock Balance</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Total Stock Left</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
     <div class="stat-card"><div class="stat-label">Today's Revenue</div><div id="todaySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card"><div class="stat-label">Daily Kilos</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Today's Kilos Sold</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
   </div>
 
   <div class="action-bar">
@@ -90,38 +89,33 @@
     <button class="btn btn-gold" onclick="exportData()">💾 BACKUP DATA</button>
     <button class="btn btn-outline" style="margin-left:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE</button>
     <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-    <div class="version-tag">VERSION 8.1 • EDIT & STATUS RESTORED</div>
+    <div class="version-tag">VERSION 8.3 • REVENUE LOGIC FIX</div>
   </div>
 </main>
 
-<!-- SALE MODAL -->
+<!-- MODALS REMAIN THE SAME -->
 <div id="saleModal" class="modal"><div class="sheet">
     <h2 id="saleTitle" style="color:var(--gold); margin-top:0;">NEW ORDER</h2>
     <input type="hidden" id="editId">
-    
     <label>Delivery Date</label><input id="sDate" type="date">
     <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
     <label>WhatsApp #</label><input id="sPhone" oninput="updateReceipt()">
     <label>Address</label><textarea id="sAddress" rows="1" oninput="updateReceipt()"></textarea>
-    
     <div style="display:flex; gap:10px;">
       <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" value="1" oninput="updateReceipt()"></div>
       <div style="flex:1;"><label>Price/kg</label><input id="sPrice" type="number" value="50" oninput="updateReceipt()"></div>
       <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" value="0" oninput="updateReceipt()"></div>
     </div>
-
     <div id="receiptPreview" class="receipt-preview">
         <div style="text-align:center; color:var(--gold); font-weight:bold; border-bottom:1px dashed #444; margin-bottom:10px;">RECEIPT PREVIEW</div>
         <div id="receiptContent">...</div>
         <div style="text-align:center; margin-top:15px; font-weight:bold; color:var(--gold); font-size:20px;" id="grandTotalLabel">TOTAL: $0</div>
     </div>
-
     <button class="btn btn-wa-action" onclick="sendWhatsApp()">📱 SEND WHATSAPP</button>
     <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ORDER</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
-<!-- STOCK & EXPENSE MODALS -->
 <div id="stockModal" class="modal"><div class="sheet">
     <h2 id="stockTitle" style="color:var(--gold); margin-top:0;">ADD STOCK</h2>
     <input type="hidden" id="stEditId">
@@ -193,7 +187,6 @@ function saveSale() {
     const p = parseFloat(document.getElementById('sPrice').value);
     const del = parseFloat(document.getElementById('sDelivery').value);
     const existing = id ? bizData.transactions.find(t => t.id == id) : null;
-    
     const entry = {
         id: id ? parseInt(id) : Date.now(),
         date: document.getElementById('sDate').value,
@@ -207,7 +200,6 @@ function saveSale() {
         phone: document.getElementById('sPhone').value,
         status: existing ? existing.status : 'PENDING'
     };
-    
     if(id) bizData.transactions = bizData.transactions.filter(t => t.id != id);
     bizData.transactions.push(entry);
     save(); closeModal('saleModal');
@@ -268,8 +260,15 @@ function render() {
     const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
     document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
         if(t.type === 'SALE') {
-            stock -= t.kilos;
-            if(t.date === today && t.status === 'COMPLETED') { dK += t.kilos; dS += t.total; }
+            // STOCK LOGIC: Subtract all sales (pending or done) to see what's actually left
+            stock -= t.kilos; 
+            
+            // REVENUE LOGIC: Only count if Today AND Completed
+            if(t.date === today && t.status === 'COMPLETED') { 
+                dK += t.kilos; 
+                dS += t.total; 
+            }
+
             const statusClass = t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending';
             return `<tr>
                 <td style="color:#888; font-size:11px;">${t.date.slice(5)}</td>
