@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Version 10.5 (RESTORED)</title>
+<title>La Perrería Gourmet PV – Version 10.7</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 150px; }
@@ -51,7 +51,6 @@
 </header>
 
 <main>
-  <!-- TOP BACKUP BAR -->
   <div class="action-bar" style="justify-content: center; border-bottom: 1px solid #222; padding-bottom: 15px;">
     <button class="btn" style="background:#333; color:#fff;" onclick="exportData()">💾 EXPORT BACKUP</button>
     <button class="btn" style="background:#333; color:#fff;" onclick="document.getElementById('importFile').click()">📂 IMPORT BACKUP</button>
@@ -62,8 +61,8 @@
     <div class="stat-card"><div class="stat-label">Chicken (Main)</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
     <div class="stat-card"><div class="stat-label">Gizzards</div><div id="gizVal" class="stat-val">0g</div></div>
     <div class="stat-card"><div class="stat-label">Feet</div><div id="feetVal" class="stat-val">0g</div></div>
-    <div class="stat-card"><div class="stat-label">Revenue</div><div id="todaySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card delivery"><div class="stat-label">Delivery</div><div id="deliverySales" class="stat-val">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Revenue</div><div id="todaySales" class="stat-val">$0 MXN</div></div>
+    <div class="stat-card delivery"><div class="stat-label">Delivery</div><div id="deliverySales" class="stat-val">$0 MXN</div></div>
     <div class="stat-card free-gift"><div class="stat-label">Free/Gifts</div><div id="freeStat" class="stat-val">0 units</div></div>
   </div>
 
@@ -75,35 +74,35 @@
   </div>
 
   <div class="card">
-    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">TRANSACTION LEDGER</h3>
+    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">ACTIVE BATCH LEDGER</h3>
     <div style="overflow-x:auto;"><table id="ledgerTable"><thead><tr><th>Date</th><th>Entry Detail</th><th>Status</th><th>Total</th><th>Actions</th></tr></thead><tbody id="ledgerBody"></tbody></table></div>
   </div>
 
-  <!-- NEW BATCH HISTORY SECTION -->
-  <div class="card" style="border-color: #440000;">
-    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">BATCH HISTORY (ARCHIVE)</h3>
+  <div class="card" style="border-color: var(--gold);">
+    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">BATCH HISTORY / ARCHIVE</h3>
     <div style="overflow-x:auto;">
         <table>
             <thead>
                 <tr>
-                    <th>Period</th>
+                    <th>Open / Close</th>
                     <th>Days</th>
-                    <th>Chicken Sold</th>
+                    <th>Kg Sold</th>
                     <th>Revenue</th>
-                    <th>Expenses</th>
-                    <th>Net Total</th>
+                    <th>Cost/Exp</th>
+                    <th>Spoil/Free</th>
+                    <th>Net Profit</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="batchBody"></tbody>
+            <tbody id="batchHistoryBody"></tbody>
         </table>
     </div>
   </div>
 </main>
 
-<footer>LA PERRERÍA GOURMET PV – V10.5</footer>
+<footer>LA PERRERÍA GOURMET PV – V10.7</footer>
 
-<!-- SALE MODAL -->
+<!-- MODALS REMAIN THE SAME AS PREVIOUS VERSION -->
 <div id="saleModal" class="modal"><div class="sheet">
     <h2 style="color:var(--gold); margin:0;">NEW ORDER</h2>
     <input type="hidden" id="editSId">
@@ -123,7 +122,6 @@
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
-<!-- STOCK MODAL -->
 <div id="stockModal" class="modal"><div class="sheet">
     <h2 style="color:var(--gold); margin:0;">ADD STOCK</h2>
     <input type="hidden" id="editStId">
@@ -136,7 +134,6 @@
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
-<!-- EXPENSE MODAL -->
 <div id="expenseModal" class="modal"><div class="sheet">
     <h2 style="color:var(--gold); margin:0;">EXPENSE / LOSS</h2>
     <input type="hidden" id="editExId">
@@ -150,11 +147,23 @@
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
 </div></div>
 
-<script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v9") || '{"transactions":[], "logo": null, "batchHistory": []}');
-if(!bizData.batchHistory) bizData.batchHistory = [];
+<div id="batchEditModal" class="modal"><div class="sheet">
+    <h2 style="color:var(--gold); margin:0;">EDIT BATCH RECORD</h2>
+    <input type="hidden" id="editBId">
+    <label>Batch Opened</label><input id="bOpen" type="date">
+    <label>Batch Closed</label><input id="bClose" type="date">
+    <label>Total Revenue ($)</label><input id="bRev" type="number">
+    <label>Total Expenses/Cost ($)</label><input id="bExp" type="number">
+    <label>Total Kilos Sold</label><input id="bKilos" type="number" step="0.1">
+    <label>Spoilage / Free (Kilos)</label><input id="bLoss" type="number" step="0.1">
+    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveBatchEdit()">UPDATE BATCH</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('batchEditModal')">CANCEL</button>
+</div></div>
 
-function save() { localStorage.setItem("perreria_v9", JSON.stringify(bizData)); render(); }
+<script>
+let bizData = JSON.parse(localStorage.getItem("perreria_v10") || '{"transactions":[], "logo": null, "batchHistory": []}');
+
+function save() { localStorage.setItem("perreria_v10", JSON.stringify(bizData)); render(); }
 
 function syncUnits(selectId, labelId) {
     const val = document.getElementById(selectId).value;
@@ -162,7 +171,7 @@ function syncUnits(selectId, labelId) {
 }
 
 function openModal(id) { 
-    const d = new Date().toLocaleDateString('sv-SE');
+    const d = new Date().toISOString().split('T')[0];
     if(id === 'saleModal') { 
         document.getElementById('editSId').value = ""; document.getElementById('sClient').value = ""; 
         document.getElementById('sPhone').value = ""; document.getElementById('sAddress').value = "";
@@ -172,7 +181,7 @@ function openModal(id) {
     if(id === 'stockModal') { document.getElementById('editStId').value = ""; document.getElementById('stSupplier').value = ""; document.getElementById('stKilos').value = 0; syncUnits('stProd','stUnitLabel'); }
     if(id === 'expenseModal') { document.getElementById('editExId').value = ""; document.getElementById('exNote').value = ""; document.getElementById('exCost').value = 0; syncUnits('exProd','exUnitLabel'); }
     document.getElementById(id).style.display = "flex"; 
-    ['sDate', 'stDate', 'exDate'].forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = d; });
+    ['sDate', 'stDate', 'exDate', 'bOpen', 'bClose'].forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = d; });
 }
 
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
@@ -243,22 +252,13 @@ function saveExpense() {
 function toggleStatus(id) { const tx = bizData.transactions.find(t => t.id === id); if(tx) { tx.status = (tx.status === 'COMPLETED') ? 'PENDING' : 'COMPLETED'; save(); } }
 function deleteTx(id) { if(confirm("Delete?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
 
-function deleteBatch(batchId) {
-    if(confirm("Are you sure you want to delete this batch from history?")) {
-        bizData.batchHistory = bizData.batchHistory.filter(b => b.id !== batchId);
-        save();
-    }
-}
-
 function render() {
-    const today = new Date().toLocaleDateString('sv-SE');
+    const today = new Date().toISOString().split('T')[0];
     let s_chicken = 0, s_giz = 0, s_feet = 0, pRev = 0, dRev = 0, fCount = 0;
     const logoImg = document.getElementById('mainLogo');
-    
     if(bizData.logo) { logoImg.src = bizData.logo; logoImg.style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
     else { logoImg.style.display = "none"; document.getElementById('logoLabel').style.display = "block"; }
 
-    // RENDER LEDGER
     document.getElementById('ledgerBody').innerHTML = bizData.transactions.sort((a,b) => b.id - a.id).map(t => {
         const prod = t.product || "CHICKEN";
         const amt = parseFloat(t.kilos) || 0;
@@ -273,31 +273,111 @@ function render() {
         return `<tr><td>${t.date.slice(5)}</td><td>${t.client} <small>(${prod})</small></td><td><button class="badge ${t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending'}" onclick="toggleStatus(${t.id})">${t.type==='SALE'?t.status:t.type}</button></td><td>$${Math.abs(t.total).toFixed(0)}</td><td class="btn-grp"><button class="btn-sm" style="background:#222; color:var(--gold);" onclick="editTx(${t.id})">EDIT</button><button class="btn-sm" style="background:#300; color:#fff;" onclick="deleteTx(${t.id})">DEL</button></td></tr>`;
     }).join("");
 
-    // RENDER BATCH HISTORY
-    document.getElementById('batchBody').innerHTML = bizData.batchHistory.sort((a,b) => b.id - a.id).map(b => {
-        return `<tr>
-            <td style="font-size:10px;">${b.start} to ${b.end}</td>
-            <td>${b.days}</td>
-            <td>${b.totalKilosSold.toFixed(1)}kg</td>
-            <td style="color:var(--success)">$${b.revenue.toFixed(0)}</td>
-            <td style="color:var(--danger)">$${b.expenses.toFixed(0)}</td>
-            <td style="font-weight:bold;">$${b.netIncome.toFixed(0)}</td>
-            <td><button class="btn-sm" style="background:#300; color:#fff;" onclick="deleteBatch(${b.id})">DEL</button></td>
-        </tr>`;
-    }).join("");
-
     document.getElementById('stockVal').innerText = s_chicken.toFixed(1) + ' kg';
     document.getElementById('gizVal').innerText = s_giz.toFixed(0) + 'g';
     document.getElementById('feetVal').innerText = s_feet.toFixed(0) + 'g';
-    document.getElementById('todaySales').innerText = '$' + pRev.toFixed(0);
-    document.getElementById('deliverySales').innerText = '$' + dRev.toFixed(0);
+    document.getElementById('todaySales').innerText = '$' + pRev.toFixed(0) + ' MXN';
+    document.getElementById('deliverySales').innerText = '$' + dRev.toFixed(0) + ' MXN';
     document.getElementById('freeStat').innerText = fCount.toFixed(1) + ' units';
+
+    renderBatchHistory();
 }
+
+function renderBatchHistory() {
+    if(!bizData.batchHistory) bizData.batchHistory = [];
+    document.getElementById('batchHistoryBody').innerHTML = bizData.batchHistory.sort((a,b) => b.id - a.id).map(b => {
+        const d1 = new Date(b.opened); const d2 = new Date(b.closed);
+        const diff = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) || 1;
+        return `<tr>
+            <td><small>O: ${b.opened}<br>C: ${b.closed}</small></td>
+            <td>${Math.max(1, diff)}</td>
+            <td>${b.totalKilosSold.toFixed(1)}</td>
+            <td>$${b.totalRevenue.toFixed(0)}</td>
+            <td>$${b.totalExpenses.toFixed(0)}</td>
+            <td>${b.lossKilos.toFixed(1)}kg</td>
+            <td style="color:var(--success); font-weight:bold;">$${b.netProfit.toFixed(0)}</td>
+            <td class="btn-grp">
+                <button class="btn-sm" style="background:#222; color:var(--gold);" onclick="editBatch(${b.id})">EDIT</button>
+                <button class="btn-sm" style="background:#300; color:#fff;" onclick="deleteBatch(${b.id})">DEL</button>
+            </td>
+        </tr>`;
+    }).join("");
+}
+
+function closeBatch() {
+    if(bizData.transactions.length === 0) return alert("No transactions to close.");
+    if(confirm("CLOSE BATCH AND SAVE TO HISTORY?")) {
+        let rev = 0, exp = 0, soldK = 0, lossK = 0;
+        let timestamps = bizData.transactions.map(t => new Date(t.date).getTime());
+        let openDate = new Date(Math.min(...timestamps)).toISOString().split('T')[0];
+        let closeDate = new Date().toISOString().split('T')[0];
+
+        bizData.transactions.forEach(t => {
+            if(t.type === 'SALE') { rev += t.total; if(t.product === "CHICKEN") soldK += t.kilos; if(t.pricePerKg === 0) lossK += t.kilos; }
+            else { exp += Math.abs(t.total); if(t.type === 'LOSS' && t.product === "CHICKEN") lossK += t.kilos; }
+        });
+
+        let stock = { CHICKEN: 0, GIZZARDS: 0, FEET: 0 };
+        bizData.transactions.forEach(t => {
+            let amt = parseFloat(t.kilos) || 0;
+            if(t.type === 'STOCK') stock[t.product] += amt;
+            else stock[t.product] -= amt;
+        });
+
+        if(!bizData.batchHistory) bizData.batchHistory = [];
+        bizData.batchHistory.push({
+            id: Date.now(), opened: openDate, closed: closeDate, totalKilosSold: soldK,
+            totalRevenue: rev, totalExpenses: exp, lossKilos: lossK, netProfit: rev - exp
+        });
+
+        bizData.transactions = [];
+        Object.keys(stock).forEach(prod => {
+            if(stock[prod] > 0) {
+                bizData.transactions.push({
+                    id: Date.now() + Math.random(), date: closeDate, type: 'STOCK', 
+                    client: 'CARRY OVER', product: prod, kilos: stock[prod], total: 0
+                });
+            }
+        });
+        save();
+    }
+}
+
+function editBatch(id) {
+    const b = bizData.batchHistory.find(x => x.id === id);
+    if(!b) return;
+    document.getElementById('editBId').value = b.id;
+    document.getElementById('bOpen').value = b.opened;
+    document.getElementById('bClose').value = b.closed;
+    document.getElementById('bRev').value = b.totalRevenue;
+    document.getElementById('bExp').value = b.totalExpenses;
+    document.getElementById('bKilos').value = b.totalKilosSold;
+    document.getElementById('bLoss').value = b.lossKilos;
+    document.getElementById('batchEditModal').style.display = "flex";
+}
+
+function saveBatchEdit() {
+    const id = parseInt(document.getElementById('editBId').value);
+    const idx = bizData.batchHistory.findIndex(x => x.id === id);
+    if(idx !== -1) {
+        let b = bizData.batchHistory[idx];
+        b.opened = document.getElementById('bOpen').value;
+        b.closed = document.getElementById('bClose').value;
+        b.totalRevenue = parseFloat(document.getElementById('bRev').value);
+        b.totalExpenses = parseFloat(document.getElementById('bExp').value);
+        b.totalKilosSold = parseFloat(document.getElementById('bKilos').value);
+        b.lossKilos = parseFloat(document.getElementById('bLoss').value);
+        b.netProfit = b.totalRevenue - b.totalExpenses;
+        save(); closeModal('batchEditModal');
+    }
+}
+
+function deleteBatch(id) { if(confirm("Permanently delete this batch?")) { bizData.batchHistory = bizData.batchHistory.filter(b => b.id !== id); save(); } }
 
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `perreria_v10.5.json`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `perreria_v10.7.json`; a.click();
 }
 function importData(event) {
     const reader = new FileReader();
@@ -310,59 +390,6 @@ function uploadLogo(event) {
     reader.readAsDataURL(event.target.files[0]);
 }
 
-function closeBatch() {
-    if(bizData.transactions.length === 0) { alert("No data to close."); return; }
-    if(confirm("CLOSE BATCH? This will calculate profit and archive results.")) {
-        let rev = 0, exp = 0, totalK = 0, lossK = 0;
-        let leftChicken = 0, leftGiz = 0, leftFeet = 0;
-        
-        // Sort transactions by date to find start/end
-        const sorted = bizData.transactions.sort((a,b) => new Date(a.date) - new Date(b.date));
-        const startDate = sorted[0].date;
-        const endDate = sorted[sorted.length-1].date;
-        const dayDiff = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) || 1;
-
-        bizData.transactions.forEach(t => {
-            const amt = parseFloat(t.kilos) || 0;
-            // Stock Logic for Carry Forward
-            if(t.type === 'STOCK') {
-                if(t.product === "CHICKEN") leftChicken += amt; else if(t.product === "GIZZARDS") leftGiz += amt; else leftFeet += amt;
-                exp += Math.abs(t.total); // Money spent on stock
-            } else if (t.type === 'SALE') {
-                if(t.product === "CHICKEN") { leftChicken -= amt; totalK += amt; } else if(t.product === "GIZZARDS") leftGiz -= amt; else leftFeet -= amt;
-                rev += t.total;
-            } else if (t.type === 'EXPENSE') {
-                exp += Math.abs(t.total);
-            } else if (t.type === 'LOSS') {
-                if(t.product === "CHICKEN") { leftChicken -= amt; lossK += amt; } else if(t.product === "GIZZARDS") leftGiz -= amt; else leftFeet -= amt;
-                exp += Math.abs(t.total);
-            }
-        });
-
-        // Add to history
-        bizData.batchHistory.push({
-            id: Date.now(),
-            start: startDate,
-            end: endDate,
-            days: dayDiff,
-            revenue: rev,
-            expenses: exp,
-            totalKilosSold: totalK,
-            spoilage: lossK,
-            netIncome: rev - exp
-        });
-
-        // CARRY FORWARD LEFTOVERS AS NEW STOCK ENTRIES
-        const newBatchStock = [];
-        const today = new Date().toLocaleDateString('sv-SE');
-        if(leftChicken > 0) newBatchStock.push({ id: Date.now()+1, date: today, type: 'STOCK', client: 'CARRY FROM PREV', product: 'CHICKEN', kilos: leftChicken, total: 0 });
-        if(leftGiz > 0) newBatchStock.push({ id: Date.now()+2, date: today, type: 'STOCK', client: 'CARRY FROM PREV', product: 'GIZZARDS', kilos: leftGiz, total: 0 });
-        if(leftFeet > 0) newBatchStock.push({ id: Date.now()+3, date: today, type: 'STOCK', client: 'CARRY FROM PREV', product: 'FEET', kilos: leftFeet, total: 0 });
-
-        bizData.transactions = newBatchStock; 
-        save();
-    }
-}
 render();
 </script>
 </body>
