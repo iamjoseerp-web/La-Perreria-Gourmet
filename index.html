@@ -3,302 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Version 9.6 (BATCH FIX)</title>
+<title>La Perrería Gourmet PV – v10.1</title>
 <style>
-  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
-  body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 150px; }
+  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; }
+  body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+  header { padding:20px; border-bottom: 2px solid var(--gold); text-align: center; }
+  main { padding:15px; max-width:1000px; margin:auto; }
   
-  header { padding:30px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
-  .logo-upload-zone { cursor: pointer; max-width: 200px; margin: auto; border: 2px dashed var(--gold); padding: 15px; border-radius: 15px; }
-  #mainLogo { max-height: 100px; max-width: 100%; display: block; margin: auto; }
-
-  main { padding:20px; max-width:1100px; margin:auto; }
-  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
-  .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); }
-  .stat-card.delivery { border-left-color: var(--blue); }
-  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
-  .stat-val { font-size: 20px; font-weight: 700; color: #fff; margin-top: 4px; }
-
-  .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-  .btn { padding: 12px 18px; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+  .backup-bar { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+  .btn { padding: 12px; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; }
   .btn-gold { background: var(--gold); color: #000; }
-  .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
-  .btn-danger-action { background: #440000; color: #fff; border: 1px solid var(--danger); }
-  .btn-wa-action { background: var(--success); color: #000; width: 100%; margin-top: 15px; border-radius: 30px; font-size: 14px; font-weight: bold; }
-  .btn-sm { padding: 6px 8px; font-size: 10px; border-radius: 3px; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+  .btn-dark { background: #222; color: #fff; border: 1px solid #444; flex: 1; }
+  .btn-danger { background: #330000; color: var(--danger); border: 1px solid var(--danger); }
 
-  .card { background: var(--card-bg); border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
-  .receipt-preview { background: #000; padding: 15px; border-radius: 8px; border: 1px solid #444; margin-top: 15px; color: #fff; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); }
+  .stat-label { font-size: 9px; color: var(--gold); text-transform: uppercase; font-weight: bold; }
+  .stat-val { font-size: 18px; font-weight: bold; }
+
+  .card { background: var(--card-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 25px; }
+  .section-title { color: var(--gold); font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 12px; }
   
-  table { width: 100%; border-collapse: collapse; min-width: 650px; }
-  th { text-align: left; color: #aaa; padding: 12px; border-bottom: 1px solid #444; font-size: 10px; text-transform: uppercase; }
-  td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: #777; font-size: 10px; padding: 8px; border-bottom: 1px solid #333; }
+  td { padding: 12px 8px; border-bottom: 1px solid #222; font-size: 14px; }
 
-  .badge { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: none; }
-  .badge-expense { background: #222; color: var(--gold); border: 1px solid var(--gold); }
-  .badge-loss { background: #330000; color: var(--danger); border: 1px solid var(--danger); }
-  .badge-pending { background: #332b00; color: var(--pending); border: 1px solid var(--pending); cursor: pointer; }
-  .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); cursor: pointer; }
-
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-  .sheet { background: #0a0a0a; padding: 25px; border-radius: 12px; border: 2px solid var(--gold); width: 100%; max-width: 450px; overflow-y: auto; max-height: 90vh; }
-  label { font-size: 10px; color: var(--gold); font-weight: 900; display: block; margin-top: 10px; text-transform: uppercase; }
-  input, textarea, select { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; }
+  .sheet { background: #0a0a0a; padding: 25px; border-radius: 12px; border: 2px solid var(--gold); width: 90%; max-width: 400px; }
+  input { width: 100%; padding: 14px; margin: 8px 0 18px; background: #161616; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; }
   
-  footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #333; padding: 15px; text-align: center; color: var(--gold); font-size: 11px; font-weight: bold; }
-  .btn-grp { display: flex; gap: 8px; }
+  footer { text-align: center; padding: 20px; font-size: 10px; color: #555; border-top: 1px solid #222; margin-top: 40px; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-upload-zone" onclick="document.getElementById('logoInput').click()">
-    <img id="mainLogo" src="" style="display:none;">
-    <div id="logoLabel" style="color:var(--gold); font-size:10px; font-weight:bold;">UPLOAD BRAND LOGO</div>
+  <div style="font-size: 24px; font-weight: 900; color: var(--gold);">LA PERRERÍA GOURMET</div>
+  <div class="backup-bar" style="max-width: 400px; margin: 15px auto;">
+    <button class="btn btn-dark" onclick="exportData()">💾 EXPORT</button>
+    <button class="btn btn-dark" onclick="document.getElementById('importFile').click()">📂 IMPORT</button>
+    <input type="file" id="importFile" hidden accept=".json" onchange="importData(event)">
   </div>
-  <input type="file" id="logoInput" hidden accept="image/*" onchange="uploadLogo(event)">
 </header>
 
 <main>
-  <div class="action-bar" style="justify-content: center; border-bottom: 1px solid #222; padding-bottom: 15px;">
-    <button class="btn" style="background:#333; color:#fff;" onclick="exportData()">💾 EXPORT BACKUP</button>
-    <button class="btn" style="background:#333; color:#fff;" onclick="document.getElementById('importFile').click()">📂 IMPORT BACKUP</button>
-    <input type="file" id="importFile" hidden onchange="importData(event)">
-  </div>
-
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Stock Remaining</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
-    <div class="stat-card"><div class="stat-label">Product Rev</div><div id="todaySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card delivery"><div class="stat-label">Delivery Rev</div><div id="deliverySales" class="stat-val">$0.00</div></div>
-    <div class="stat-card"><div class="stat-label">Paid Kilos</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
-    <div class="stat-card" style="border-left-color:#555;"><div class="stat-label">Free Kilos</div><div id="freeKilos" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Stock</div><div id="stockVal" class="stat-val">0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Sales</div><div id="salesVal" class="stat-val">$0</div></div>
+    <div class="stat-card" style="border-left-color:var(--success)"><div class="stat-label">Net Profit</div><div id="profitVal" class="stat-val">$0</div></div>
   </div>
 
-  <div class="action-bar">
-    <button class="btn btn-gold" onclick="openModal('saleModal')">New Order</button>
-    <button class="btn btn-outline" onclick="openModal('stockModal')">+ Stock</button>
-    <button class="btn btn-danger-action" onclick="openModal('expenseModal')">+ Expense / Loss</button>
-    <button class="btn" style="background:#440000; color:var(--gold); border:1px solid var(--danger);" onclick="closeBatch()">Close Batch</button>
+  <div style="display:flex; gap:12px; margin-bottom:25px;">
+    <button class="btn btn-gold" style="flex:1" onclick="openModal('saleModal')">+ ORDER</button>
+    <button class="btn btn-gold" style="flex:1" onclick="openModal('expModal')">+ EXPENSE</button>
+    <button class="btn btn-danger" style="flex:1.2" onclick="initBatchClose()">CLOSE BATCH</button>
   </div>
 
   <div class="card">
-    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">TRANSACTION LEDGER</h3>
+    <div class="section-title">Active Batch Ledger</div>
     <div style="overflow-x:auto;">
       <table>
-        <thead><tr><th>Date</th><th>Entry Detail</th><th>Type/Status</th><th>Total</th><th>Manage Actions</th></tr></thead>
+        <thead><tr><th>Date</th><th>Detail</th><th>Kgs</th><th>Total</th></tr></thead>
         <tbody id="ledgerBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="border-top: 3px solid var(--gold);">
+    <div class="section-title">Archived Batch History</div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Closed On</th><th>Sales</th><th>Costs</th><th>Net Profit</th></tr></thead>
+        <tbody id="historyBody"></tbody>
       </table>
     </div>
   </div>
 </main>
 
-<footer>LA PERRERÍA GOURMET PV – VERSION 9.6</footer>
+<footer>
+    LA PERRERÍA GOURMET PV • VERSION 10.1 • PUERTO VALLARTA
+</footer>
 
-<!-- MODALS -->
-<div id="expenseModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin:0;" id="exTitle">EXPENSE OR LOSS</h2>
-    <input type="hidden" id="editExId">
-    <label>Type</label>
-    <select id="exType"><option value="EXPENSE">BUSINESS EXPENSE</option><option value="LOSS">PRODUCT LOSS</option></select>
-    <label>Date</label><input id="exDate" type="date">
-    <label>Description</label><input id="exNote" placeholder="What was it for?">
-    <label>Cost ($)</label><input id="exCost" type="number" step="0.01">
-    <label>Kilos (If Loss)</label><input id="exKilos" type="number" step="0.1">
-    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveExpense()">SAVE ENTRY</button>
-    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
+<!-- Modals -->
+<div id="reportModal" class="modal"><div class="sheet">
+    <h2 style="color:var(--gold); margin:0;">BATCH REPORT</h2>
+    <div id="reportSummary" style="font-family: monospace; line-height: 2; margin: 20px 0;"></div>
+    <button class="btn btn-gold" style="width:100%;" onclick="finalizeArchive()">SAVE & CLEAR</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('reportModal')">BACK</button>
 </div></div>
 
 <div id="saleModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin:0;" id="sTitle">NEW ORDER</h2>
-    <input type="hidden" id="editSId">
-    <input id="sDate" type="date">
-    <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
-    <label>WhatsApp (Digits only)</label><input id="sPhone">
-    <label>Address</label><input id="sAddress" oninput="updateReceipt()">
-    <div style="display:flex; gap:10px;">
-      <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" oninput="updateReceipt()"></div>
-      <div style="flex:1;"><label>Price/Kg</label><input id="sPrice" type="number" oninput="updateReceipt()"></div>
-      <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" oninput="updateReceipt()"></div>
-    </div>
-    <div id="receiptPreview" class="receipt-preview"><div id="receiptContent">...</div><div style="text-align:center; margin-top:10px; font-weight:bold; color:var(--gold); font-size:18px;" id="grandTotalLabel">TOTAL: $0</div></div>
-    <button class="btn btn-wa-action" onclick="sendWhatsApp()">📱 SEND WHATSAPP</button>
-    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ORDER</button>
-    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
+    <input id="sClient" type="text" placeholder="Client Name">
+    <input id="sKilos" type="number" step="0.1" placeholder="Kilos">
+    <input id="sPrice" type="number" value="50">
+    <input id="sDel" type="number" value="10">
+    <button class="btn btn-gold" style="width:100%;" onclick="saveItem('SALE')">SAVE ORDER</button>
 </div></div>
 
-<div id="stockModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin:0;" id="stTitle">ADD STOCK</h2>
-    <input type="hidden" id="editStId">
-    <input id="stDate" type="date">
-    <label>Product / Provider</label><input id="stSupplier" placeholder="e.g. Meat, Gizzards, Feet">
-    <label>Kilos Received</label><input id="stKilos" type="number" step="0.1">
-    <label>Total Cost ($)</label><input id="stCost" type="number" step="0.01">
-    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveStock()">SAVE STOCK</button>
-    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
+<div id="expModal" class="modal"><div class="sheet">
+    <input id="eNote" type="text" placeholder="Expense Note">
+    <input id="eCost" type="number" placeholder="Cost $">
+    <input id="eKilos" type="number" value="0">
+    <button class="btn btn-gold" style="width:100%;" onclick="saveItem('EXPENSE')">SAVE EXPENSE</button>
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v9") || '{"transactions":[], "logo": null, "history": []}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v10.1") || '{"transactions":[], "history":[]}');
+let tempSummary = {};
 
-function save() { 
-    localStorage.setItem("perreria_v9", JSON.stringify(bizData)); 
-    render(); 
-}
-
-function openModal(id) { 
-    const d = new Date().toLocaleDateString('sv-SE');
-    if(id === 'expenseModal') {
-        document.getElementById('editExId').value = ""; document.getElementById('exNote').value = ""; 
-        document.getElementById('exCost').value = 0; document.getElementById('exKilos').value = 0; 
-        document.getElementById('exType').value = "EXPENSE"; document.getElementById('exTitle').innerText = "EXPENSE OR LOSS";
-    } else if(id === 'saleModal') {
-        // RESET FIELDS TO BLANK FOR NEW ORDER
-        document.getElementById('editSId').value = ""; 
-        document.getElementById('sClient').value = ""; 
-        document.getElementById('sPhone').value = ""; 
-        document.getElementById('sAddress').value = ""; 
-        document.getElementById('sKilos').value = 0; 
-        document.getElementById('sPrice').value = 50; 
-        document.getElementById('sDelivery').value = 10; 
-        document.getElementById('sTitle').innerText = "NEW ORDER";
-        updateReceipt();
-    } else if(id === 'stockModal') {
-        document.getElementById('editStId').value = ""; 
-        document.getElementById('stSupplier').value = ""; 
-        document.getElementById('stKilos').value = 0; 
-        document.getElementById('stCost').value = 0;
-        document.getElementById('stTitle').innerText = "ADD STOCK";
-    }
-    document.getElementById(id).style.display = "flex"; 
-    ['sDate', 'stDate', 'exDate'].forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = d; });
-}
-
+function save() { localStorage.setItem("perreria_v10.1", JSON.stringify(bizData)); render(); }
+function openModal(id) { document.getElementById(id).style.display = "flex"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
-function editTx(id) {
-    const t = bizData.transactions.find(x => x.id === id);
-    if(!t) return;
-    if(t.type === 'SALE') {
-        openModal('saleModal'); document.getElementById('sTitle').innerText = "EDIT ORDER";
-        document.getElementById('editSId').value = t.id; document.getElementById('sDate').value = t.date;
-        document.getElementById('sClient').value = t.client; document.getElementById('sPhone').value = t.phone || "";
-        document.getElementById('sAddress').value = t.address || ""; document.getElementById('sKilos').value = t.kilos;
-        document.getElementById('sPrice').value = t.pricePerKg; document.getElementById('sDelivery').value = t.delFee;
-        updateReceipt();
-    } else if(t.type === 'STOCK') {
-        openModal('stockModal'); document.getElementById('stTitle').innerText = "EDIT STOCK";
-        document.getElementById('editStId').value = t.id; document.getElementById('stDate').value = t.date;
-        document.getElementById('stSupplier').value = t.client; document.getElementById('stKilos').value = t.kilos;
-        document.getElementById('stCost').value = Math.abs(t.total);
+function saveItem(type) {
+    const item = { id: Date.now(), date: new Date().toLocaleDateString() };
+    if(type === 'SALE') {
+        item.type = 'SALE'; item.note = document.getElementById('sClient').value || 'Order';
+        item.kgs = parseFloat(document.getElementById('sKilos').value) || 0;
+        item.total = (item.kgs * (parseFloat(document.getElementById('sPrice').value) || 0)) + (parseFloat(document.getElementById('sDel').value) || 0);
     } else {
-        openModal('expenseModal'); document.getElementById('exTitle').innerText = "EDIT " + t.type;
-        document.getElementById('editExId').value = t.id; document.getElementById('exDate').value = t.date;
-        document.getElementById('exType').value = t.type; document.getElementById('exNote').value = t.client;
-        document.getElementById('exCost').value = Math.abs(t.total); document.getElementById('exKilos').value = t.kilos || 0;
+        item.type = 'EXPENSE'; item.note = document.getElementById('eNote').value || 'Expense';
+        item.kgs = parseFloat(document.getElementById('eKilos').value) || 0;
+        item.total = -(parseFloat(document.getElementById('eCost').value) || 0);
     }
+    bizData.transactions.push(item); save(); closeModal('saleModal'); closeModal('expModal');
 }
-
-function updateReceipt() {
-    const k = parseFloat(document.getElementById('sKilos').value) || 0, p = parseFloat(document.getElementById('sPrice').value) || 0, d = parseFloat(document.getElementById('sDelivery').value) || 0;
-    const total = (k * p) + d;
-    document.getElementById('grandTotalLabel').innerText = `TOTAL: $${total} MXN`;
-    document.getElementById('receiptContent').innerText = `CLIENTE: ${document.getElementById('sClient').value || "..."}\nPEDIDO: ${k}kg x $${p}\nENVÍO: $${d}\n📍: ${document.getElementById('sAddress').value || "..."}`;
-}
-
-function sendWhatsApp() {
-    const k = document.getElementById('sKilos').value, p = document.getElementById('sPrice').value, del = document.getElementById('sDelivery').value, phone = document.getElementById('sPhone').value.replace(/\D/g,'');
-    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n*PEDIDO:* ${k}kg x $${p}\n*ENVÍO:* $${del}\n*TOTAL: $${(k*p)+parseFloat(del)} MXN*`);
-    if(phone) window.open(`https://wa.me/${phone.length === 10 ? '52'+phone : phone}?text=${msg}`, '_blank');
-}
-
-function saveSale() {
-    const id = document.getElementById('editSId').value;
-    const oldTx = id ? bizData.transactions.find(x=>x.id==id) : null;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, phone: document.getElementById('sPhone').value, address: document.getElementById('sAddress').value, kilos: parseFloat(document.getElementById('sKilos').value) || 0, pricePerKg: parseFloat(document.getElementById('sPrice').value) || 0, delFee: parseFloat(document.getElementById('sDelivery').value) || 0, status: oldTx ? oldTx.status : 'PENDING' };
-    data.total = (data.kilos * data.pricePerKg) + data.delFee;
-    if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
-    else { bizData.transactions.push(data); }
-    save(); closeModal('saleModal');
-}
-
-function saveStock() {
-    const id = document.getElementById('editStId').value;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value) || 0, total: -parseFloat(document.getElementById('stCost').value) || 0 };
-    if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
-    else { bizData.transactions.push(data); }
-    save(); closeModal('stockModal');
-}
-
-function saveExpense() {
-    const id = document.getElementById('editExId').value;
-    const data = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('exDate').value, type: document.getElementById('exType').value, client: document.getElementById('exNote').value, kilos: parseFloat(document.getElementById('exKilos').value) || 0, total: -parseFloat(document.getElementById('exCost').value) || 0 };
-    if(id) { const idx = bizData.transactions.findIndex(x => x.id == id); bizData.transactions[idx] = data; }
-    else { bizData.transactions.push(data); }
-    save(); closeModal('expenseModal');
-}
-
-function toggleStatus(id) { const tx = bizData.transactions.find(t => t.id === id); if(tx) { tx.status = (tx.status === 'COMPLETED') ? 'PENDING' : 'COMPLETED'; save(); } }
-function deleteTx(id) { if(confirm("Delete this entry forever?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
 
 function render() {
-    const today = new Date().toLocaleDateString('sv-SE');
-    let stock = 0, prodRev = 0, delRev = 0, paidK = 0, freeK = 0;
-    if(bizData.logo) { document.getElementById('mainLogo').src = bizData.logo; document.getElementById('mainLogo').style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
-    
-    document.getElementById('ledgerBody').innerHTML = bizData.transactions.sort((a,b) => b.id - a.id).map(t => {
-        let typeBadge = '';
-        if(t.type === 'SALE') {
-            stock -= t.kilos;
-            if(t.date === today && t.status === 'COMPLETED') { prodRev += (t.kilos * t.pricePerKg); delRev += t.delFee; if(t.pricePerKg > 0) paidK += t.kilos; else freeK += t.kilos; }
-            typeBadge = `<button class="badge ${t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending'}" onclick="toggleStatus(${t.id})">${t.status}</button>`;
-        } else if (t.type === 'EXPENSE') { typeBadge = `<span class="badge badge-expense">EXPENSE</span>`; }
-        else if (t.type === 'LOSS') { stock -= t.kilos; typeBadge = `<span class="badge badge-loss">LOSS</span>`; }
-        else if (t.type === 'STOCK') { stock += t.kilos; typeBadge = `<span class="badge" style="background:#444; color:#fff;">STOCK</span>`; }
-        
-        return `<tr>
-            <td>${t.date.slice(5)}</td>
-            <td>${t.client}</td>
-            <td>${typeBadge}</td>
-            <td>$${Math.abs(t.total).toFixed(2)}</td>
-            <td class="btn-grp">
-                <button class="btn-sm" style="background:#222; color:var(--gold); border:1px solid var(--gold);" onclick="editTx(${t.id})">EDIT</button>
-                <button class="btn-sm" style="background:#330000; color:#fff;" onclick="deleteTx(${t.id})">DEL</button>
-            </td>
-        </tr>`;
-    }).join("");
+    let stock = 0, sales = 0, costs = 0;
+    document.getElementById('ledgerBody').innerHTML = bizData.transactions.map(t => {
+        if(t.type === 'SALE') { sales += t.total; stock -= t.kgs; }
+        else { costs += Math.abs(t.total); stock += t.kgs; }
+        return `<tr><td>${t.date.slice(0,5)}</td><td>${t.note}</td><td>${t.kgs}</td><td style="color:${t.total < 0 ? 'var(--danger)':'#fff'}">$${Math.abs(t.total).toFixed(2)}</td></tr>`;
+    }).join('');
 
-    document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
-    document.getElementById('todaySales').innerText = '$' + prodRev.toFixed(2);
-    document.getElementById('deliverySales').innerText = '$' + delRev.toFixed(2);
-    document.getElementById('todayKilos').innerText = paidK.toFixed(1) + ' kg';
-    document.getElementById('freeKilos').innerText = freeK.toFixed(1) + ' kg';
+    document.getElementById('historyBody').innerHTML = bizData.history.slice().reverse().map(h => `
+        <tr><td>${h.date}</td><td>$${h.gross}</td><td>$${h.costs}</td><td style="color:var(--success); font-weight:bold;">$${h.net}</td></tr>
+    `).join('');
+
+    document.getElementById('stockVal').innerText = stock.toFixed(1) + " kg";
+    document.getElementById('salesVal').innerText = "$" + sales.toFixed(2);
+    document.getElementById('profitVal').innerText = "$" + (sales - costs).toFixed(2);
+}
+
+function initBatchClose() {
+    if(bizData.transactions.length === 0) return;
+    let gross = 0, costs = 0;
+    bizData.transactions.forEach(t => { if(t.total > 0) gross += t.total; else costs += Math.abs(t.total); });
+    tempSummary = { date: new Date().toLocaleDateString(), gross: gross.toFixed(2), costs: costs.toFixed(2), net: (gross - costs).toFixed(2) };
+    document.getElementById('reportSummary').innerHTML = `SALES: $${tempSummary.gross}<br>COSTS: $${tempSummary.costs}<br>-------------------<br>NET: $${tempSummary.net}`;
+    openModal('reportModal');
+}
+
+function finalizeArchive() {
+    bizData.history.push(tempSummary); bizData.transactions = []; save(); closeModal('reportModal');
 }
 
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `perreria_v9.6_backup.json`; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `Perreria_v10.1_${new Date().toISOString().slice(0,10)}.json`; a.click();
 }
+
 function importData(event) {
     const reader = new FileReader();
-    reader.onload = function(e) { bizData = JSON.parse(e.target.result); save(); location.reload(); };
+    reader.onload = (e) => {
+        if(confirm("Replace all data with this backup?")) {
+            bizData = JSON.parse(e.target.result);
+            save(); location.reload();
+        }
+    };
     reader.readAsText(event.target.files[0]);
 }
-function uploadLogo(event) {
-    const reader = new FileReader();
-    reader.onload = function() { bizData.logo = reader.result; save(); };
-    reader.readAsDataURL(event.target.files[0]);
-}
 
-function closeBatch() {
-    if(confirm("Are you sure you want to CLOSE BATCH? This will clear all transactions in the current list.")) {
-        bizData.transactions = []; // Empty the list
-        save(); // Save the empty list and trigger a re-render automatically
-        alert("Batch closed. Ledger is now empty.");
-    }
-}
-
-// Initial Run
 render();
 </script>
 </body>
