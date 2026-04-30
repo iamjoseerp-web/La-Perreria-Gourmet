@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Version 8.9 (FULL RESTORE)</title>
+<title>La Perrería Gourmet PV – Version 9.0 (EXPENSE FIX)</title>
 <style>
-  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
+  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; --expense: #888; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 150px; }
   
   header { padding:30px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
@@ -36,20 +36,18 @@
   th { text-align: left; color: #aaa; padding: 12px; border-bottom: 1px solid #444; font-size: 10px; text-transform: uppercase; }
   td { padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
 
-  .badge { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; min-width: 85px; }
-  .badge-pending { background: #332b00; color: var(--pending); border: 1px solid var(--pending); }
-  .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); }
-
-  .btn-sm { padding: 8px 12px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: 900; border: none; text-transform: uppercase; margin-right: 5px; }
-  .btn-del-sm { background: var(--danger); color: #fff; }
+  .badge { padding: 6px 10px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: none; }
+  .badge-expense { background: #222; color: var(--gold); border: 1px solid var(--gold); }
+  .badge-loss { background: #330000; color: var(--danger); border: 1px solid var(--danger); }
+  .badge-pending { background: #332b00; color: var(--pending); border: 1px solid var(--pending); cursor: pointer; }
+  .badge-done { background: #002200; color: var(--success); border: 1px solid var(--success); cursor: pointer; }
 
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
   .sheet { background: #0a0a0a; padding: 25px; border-radius: 12px; border: 2px solid var(--gold); width: 100%; max-width: 450px; overflow-y: auto; max-height: 90vh; }
   label { font-size: 10px; color: var(--gold); font-weight: 900; display: block; margin-top: 10px; text-transform: uppercase; }
-  input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+  input, textarea, select { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
   
-  .history-card { background: #1a1a1a; padding: 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--gold); }
-  footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #333; padding: 15px; text-align: center; color: var(--gold); font-size: 11px; font-weight: bold; letter-spacing: 1px; }
+  footer { position: fixed; bottom: 0; width: 100%; background: #000; border-top: 1px solid #333; padding: 15px; text-align: center; color: var(--gold); font-size: 11px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -63,7 +61,6 @@
 </header>
 
 <main>
-  <!-- DATA CONTROLS (RESTORED TO TOP) -->
   <div class="action-bar" style="justify-content: center; border-bottom: 1px solid #222; padding-bottom: 15px;">
     <button class="btn btn-backup" onclick="exportData()">💾 EXPORT BACKUP</button>
     <button class="btn btn-backup" onclick="document.getElementById('importFile').click()">📂 IMPORT BACKUP</button>
@@ -89,27 +86,37 @@
     <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">TRANSACTION LEDGER</h3>
     <div style="overflow-x:auto;">
       <table>
-        <thead><tr><th>Date</th><th>Client/Entry</th><th>Status</th><th>Total</th><th>Manage</th></tr></thead>
+        <thead><tr><th>Date</th><th>Entry Detail</th><th>Type</th><th>Total</th><th>Action</th></tr></thead>
         <tbody id="ledgerBody"></tbody>
       </table>
     </div>
   </div>
-
-  <div id="batchHistorySection" class="card" style="display:none;">
-    <h3 style="margin:0 0 15px 0; color:var(--gold); font-size:12px; letter-spacing:1px;">BATCH ARCHIVE SUMMARY</h3>
-    <div id="historyContent"></div>
-  </div>
 </main>
 
-<footer>LA PERRERÍA GOURMET PV – VERSION 8.9</footer>
+<footer>LA PERRERÍA GOURMET PV – VERSION 9.0</footer>
 
-<!-- SALE MODAL RESTORED FULLY -->
+<!-- EXPENSE/LOSS MODAL (UPDATED) -->
+<div id="expenseModal" class="modal"><div class="sheet">
+    <h2 style="color:var(--gold); margin:0;">EXPENSE OR LOSS</h2>
+    <label>Entry Type</label>
+    <select id="exType">
+        <option value="EXPENSE">BUSINESS EXPENSE (Bags, Gas, Rent)</option>
+        <option value="LOSS">PRODUCT LOSS (Spoilage, Theft, Damage)</option>
+    </select>
+    <label>Date</label><input id="exDate" type="date">
+    <label>Description (e.g. 1000 Bags, Gas for delivery)</label><input id="exNote" placeholder="What was this for?">
+    <label>Money Amount ($)</label><input id="exCost" type="number" value="0">
+    <label>Kilos Lost (Only for Spoilage/Theft)</label><input id="exKilos" type="number" step="0.1" value="0">
+    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveExpense()">SAVE ENTRY</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
+</div></div>
+
+<!-- SALE MODAL -->
 <div id="saleModal" class="modal"><div class="sheet">
     <h2 style="color:var(--gold); margin:0;">NEW ORDER</h2>
-    <input type="hidden" id="editId">
-    <label>Delivery Date</label><input id="sDate" type="date">
+    <input id="sDate" type="date">
     <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
-    <label>WhatsApp Number</label><input id="sPhone" oninput="updateReceipt()">
+    <label>WhatsApp</label><input id="sPhone" oninput="updateReceipt()">
     <label>Address</label><textarea id="sAddress" rows="1" oninput="updateReceipt()"></textarea>
     <div style="display:flex; gap:10px;">
       <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" value="1" oninput="updateReceipt()"></div>
@@ -117,7 +124,6 @@
       <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" value="10" oninput="updateReceipt()"></div>
     </div>
     <div id="receiptPreview" class="receipt-preview">
-        <div style="text-align:center; color:var(--gold); font-weight:bold; border-bottom:1px dashed #444; margin-bottom:10px;">RECEIPT PREVIEW</div>
         <div id="receiptContent">Waiting for input...</div>
         <div style="text-align:center; margin-top:15px; font-weight:bold; color:var(--gold); font-size:18px;" id="grandTotalLabel">TOTAL: $0</div>
     </div>
@@ -131,42 +137,28 @@
     <h2 style="color:var(--gold); margin:0;">ADD STOCK</h2>
     <input id="stDate" type="date">
     <label>Supplier</label><input id="stSupplier">
-    <label>Kilos</label><input id="stKilos" type="number" step="0.1">
+    <label>Kilos Received</label><input id="stKilos" type="number" step="0.1">
     <label>Total Cost ($)</label><input id="stCost" type="number">
     <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveStock()">SAVE STOCK</button>
     <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
-<!-- EXPENSE/LOSS MODAL -->
-<div id="expenseModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--danger); margin:0;">EXPENSE / LOSS / SPOILAGE</h2>
-    <input id="exDate" type="date">
-    <label>Reason (e.g. Theft, Spoilage, Gas)</label><input id="exNote">
-    <label>Amount Money Lost ($)</label><input id="exCost" type="number" value="0">
-    <label>Kilos Lost (if applicable)</label><input id="exKilos" type="number" step="0.1" value="0">
-    <button class="btn btn-danger-action" style="width:100%; margin-top:20px;" onclick="saveExpense()">RECORD LOSS</button>
-    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
-</div></div>
-
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v8_9") || '{"transactions":[], "logo": null, "history": []}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v9") || '{"transactions":[], "logo": null, "history": []}');
 
-function save() { localStorage.setItem("perreria_v8_9", JSON.stringify(bizData)); render(); }
+function save() { localStorage.setItem("perreria_v9", JSON.stringify(bizData)); render(); }
 
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `perreria_backup_${new Date().toLocaleDateString()}.json`;
+    a.href = url; a.download = `perreria_v9_backup.json`;
     a.click();
 }
 
 function importData(event) {
     const reader = new FileReader();
-    reader.onload = function(e) {
-        try { bizData = JSON.parse(e.target.result); save(); location.reload(); }
-        catch(err) { alert("Invalid file format."); }
-    };
+    reader.onload = function(e) { bizData = JSON.parse(e.target.result); save(); location.reload(); };
     reader.readAsText(event.target.files[0]);
 }
 
@@ -180,10 +172,9 @@ function openModal(id) {
     document.getElementById(id).style.display = "flex"; 
     const dateFields = ['sDate', 'stDate', 'exDate'];
     dateFields.forEach(f => { if(document.getElementById(f)) document.getElementById(f).value = new Date().toLocaleDateString('sv-SE'); });
-    if(id === 'saleModal') updateReceipt();
 }
 
-function closeModal(id) { document.getElementById(id).style.display = "none"; document.getElementById('editId').value = ""; }
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 function updateReceipt() {
     const k = parseFloat(document.getElementById('sKilos').value) || 0;
@@ -191,7 +182,7 @@ function updateReceipt() {
     const d = parseFloat(document.getElementById('sDelivery').value) || 0;
     const total = (k * p) + d;
     document.getElementById('grandTotalLabel').innerText = `TOTAL: $${total} MXN`;
-    document.getElementById('receiptContent').innerHTML = `CLIENTE: ${document.getElementById('sClient').value || "..."}<br>PEDIDO: ${k}kg x $${p}<br>ENVÍO: $${d}<br>📍: ${document.getElementById('sAddress').value || "..."}`;
+    document.getElementById('receiptContent').innerHTML = `CLIENTE: ${document.getElementById('sClient').value}<br>PEDIDO: ${k}kg x $${p}<br>ENVÍO: $${d}<br>📍: ${document.getElementById('sAddress').value}`;
 }
 
 function sendWhatsApp() {
@@ -204,37 +195,21 @@ function sendWhatsApp() {
 }
 
 function saveSale() {
-    const id = document.getElementById('editId').value;
     const k = parseFloat(document.getElementById('sKilos').value) || 0;
     const p = parseFloat(document.getElementById('sPrice').value) || 0;
     const d = parseFloat(document.getElementById('sDelivery').value) || 0;
-    const entry = {
-        id: id ? parseInt(id) : Date.now(),
-        date: document.getElementById('sDate').value,
-        type: 'SALE',
-        client: document.getElementById('sClient').value,
-        phone: document.getElementById('sPhone').value,
-        address: document.getElementById('sAddress').value,
-        kilos: k,
-        pricePerKg: p,
-        delFee: d,
-        total: (k * p) + d,
-        status: 'PENDING'
-    };
-    if(id) bizData.transactions = bizData.transactions.filter(t => t.id != id);
-    bizData.transactions.push(entry);
+    bizData.transactions.push({ id: Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, kilos: k, pricePerKg: p, delFee: d, total: (k * p) + d, status: 'PENDING' });
     save(); closeModal('saleModal');
 }
 
 function saveStock() {
-    const entry = { id: Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value), total: -parseFloat(document.getElementById('stCost').value) };
-    bizData.transactions.push(entry);
+    bizData.transactions.push({ id: Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value), total: -parseFloat(document.getElementById('stCost').value) });
     save(); closeModal('stockModal');
 }
 
 function saveExpense() {
-    const entry = { id: Date.now(), date: document.getElementById('exDate').value, type: 'LOSS', client: document.getElementById('exNote').value, kilos: parseFloat(document.getElementById('exKilos').value), total: -parseFloat(document.getElementById('exCost').value) };
-    bizData.transactions.push(entry);
+    const type = document.getElementById('exType').value;
+    bizData.transactions.push({ id: Date.now(), date: document.getElementById('exDate').value, type: type, client: document.getElementById('exNote').value, kilos: parseFloat(document.getElementById('exKilos').value), total: -parseFloat(document.getElementById('exCost').value) });
     save(); closeModal('expenseModal');
 }
 
@@ -243,42 +218,29 @@ function toggleStatus(id) {
     if(tx) { tx.status = (tx.status === 'COMPLETED') ? 'PENDING' : 'COMPLETED'; save(); }
 }
 
-function deleteTx(id) { if(confirm("Delete this record permanently?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
-
-function closeBatch() {
-    if(!confirm("Are you sure? This will archive all current transactions and reset your dashboard.")) return;
-    let pk = 0, rev = 0, exp = 0;
-    bizData.transactions.forEach(t => {
-        if(t.type === 'SALE' && t.status === 'COMPLETED') { pk += t.kilos; rev += (t.kilos * t.pricePerKg); }
-        if(t.type === 'STOCK' || t.type === 'LOSS') { exp += Math.abs(t.total); }
-    });
-    const summary = {
-        end: new Date().toLocaleDateString(),
-        kilos: pk.toFixed(1),
-        net: (rev - exp).toFixed(2),
-        expenses: exp.toFixed(2)
-    };
-    bizData.history.push(summary);
-    bizData.transactions = [];
-    save();
-}
+function deleteTx(id) { if(confirm("Delete?")) { bizData.transactions = bizData.transactions.filter(t => t.id !== id); save(); } }
 
 function render() {
     const today = new Date().toLocaleDateString('sv-SE');
     let stock = 0, prodRev = 0, delRev = 0, paidK = 0, freeK = 0;
-
     if(bizData.logo) { document.getElementById('mainLogo').src = bizData.logo; document.getElementById('mainLogo').style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
     
-    const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
-    document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
+    document.getElementById('ledgerBody').innerHTML = bizData.transactions.sort((a,b) => b.id - a.id).map(t => {
+        let typeBadge = '';
         if(t.type === 'SALE') {
             stock -= t.kilos;
             if(t.date === today && t.status === 'COMPLETED') { prodRev += (t.kilos * t.pricePerKg); delRev += t.delFee; if(t.pricePerKg > 0) paidK += t.kilos; else freeK += t.kilos; }
-            return `<tr><td>${t.date.slice(5)}</td><td><strong>${t.client}</strong></td><td><button class="badge ${t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending'}" onclick="toggleStatus(${t.id})">${t.status}</button></td><td>$${t.total}</td><td><button class="btn-sm btn-del-sm" onclick="deleteTx(${t.id})">DEL</button></td></tr>`;
-        } else {
-            if(t.type === 'STOCK') stock += t.kilos; if(t.type === 'LOSS') stock -= t.kilos;
-            return `<tr><td>${t.date.slice(5)}</td><td><span style="color:var(--gold)">${t.type}</span>: ${t.client}</td><td>-</td><td>$${Math.abs(t.total)}</td><td><button class="btn-sm btn-del-sm" onclick="deleteTx(${t.id})">DEL</button></td></tr>`;
+            typeBadge = `<button class="badge ${t.status === 'COMPLETED' ? 'badge-done' : 'badge-pending'}" onclick="toggleStatus(${t.id})">${t.status}</button>`;
+        } else if (t.type === 'EXPENSE') {
+            typeBadge = `<span class="badge badge-expense">EXPENSE</span>`;
+        } else if (t.type === 'LOSS') {
+            stock -= t.kilos;
+            typeBadge = `<span class="badge badge-loss">LOSS</span>`;
+        } else if (t.type === 'STOCK') {
+            stock += t.kilos;
+            typeBadge = `<span class="badge" style="background:#444;">STOCK</span>`;
         }
+        return `<tr><td>${t.date.slice(5)}</td><td>${t.client}</td><td>${typeBadge}</td><td>$${Math.abs(t.total)}</td><td><button class="btn-sm" style="background:var(--danger); color:#fff;" onclick="deleteTx(${t.id})">DEL</button></td></tr>`;
     }).join("");
 
     document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
@@ -286,11 +248,6 @@ function render() {
     document.getElementById('deliverySales').innerText = '$' + delRev.toFixed(2);
     document.getElementById('todayKilos').innerText = paidK.toFixed(1) + ' kg';
     document.getElementById('freeKilos').innerText = freeK.toFixed(1) + ' kg';
-
-    if(bizData.history.length > 0) {
-        document.getElementById('batchHistorySection').style.display = "block";
-        document.getElementById('historyContent').innerHTML = bizData.history.map(h => `<div class="history-card"><strong>Batch Closed: ${h.end}</strong><br>Kilos Sold: ${h.kilos}kg | Batch Expenses: $${h.expenses}<br><strong>BATCH NET REVENUE: $${h.net}</strong></div>`).join("");
-    }
 }
 render();
 </script>
