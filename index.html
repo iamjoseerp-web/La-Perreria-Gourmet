@@ -3,228 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – V7.3</title>
+<title>La Perrería Gourmet PV – V7.9</title>
 <style>
-  :root { --gold: #d4af37; --bg: #0b0b0b; --card-bg: #141414; --text: #f5f5f5; --danger: #cc0000; --success: #25D366; }
-  body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; }
+  :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --edit: #3498db; }
+  body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
   
-  header { padding:20px; border-bottom: 3px solid var(--gold); background: #000; text-align: center; }
-  .logo-placeholder { font-weight: 900; color: var(--gold); letter-spacing: 2px; font-size: 24px; text-transform: uppercase; }
-  .logo-sub { font-size: 12px; color: #888; letter-spacing: 4px; }
+  header { padding:40px 20px; border-bottom: 2px solid var(--gold); background: #000; text-align: center; }
+  .logo-upload-zone { 
+    cursor: pointer; 
+    max-width: 250px; 
+    margin: auto; 
+    border: 3px dashed var(--gold); 
+    padding: 20px; 
+    border-radius: 15px;
+    background: #0a0a0a;
+  }
+  #mainLogo { max-height: 120px; max-width: 100%; display: block; margin: auto; }
+  .upload-text { color: var(--gold); font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
 
   main { padding:20px; max-width:1100px; margin:auto; }
-
   .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-  .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 20px; border-radius: 12px; border-top: 4px solid var(--gold); }
-  .stat-label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: 900; }
-  .stat-val { font-size: 24px; font-weight: 700; color: #fff; margin-top: 5px; }
+  .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 20px; border-radius: 8px; border-left: 5px solid var(--gold); }
+  .stat-label { font-size: 11px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
+  .stat-val { font-size: 28px; font-weight: 700; color: #fff; margin-top: 5px; }
 
   .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
-  .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn { padding: 14px 22px; border: none; border-radius: 4px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
   .btn-gold { background: var(--gold); color: #000; }
   .btn-outline { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
-  .btn-danger { background: #440000; color: #ff5a5a; }
-  .btn-wa-action { background: var(--success); color: #000; width: 100%; margin-top: 10px; }
+  .btn-danger { background: #440000; color: #fff; border: 1px solid var(--danger); }
+  .btn-wa-action { background: var(--success); color: #000; width: 100%; margin-top: 15px; border-radius: 30px; font-size: 14px; }
 
-  .card { background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 15px; padding: 20px; margin-bottom: 25px; }
+  .card { background: var(--card-bg); border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
   .table-container { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; background: #080808; }
-  th { text-align: left; color: var(--gold); padding: 12px; border-bottom: 2px solid #222; font-size: 11px; text-transform: uppercase; }
-  td { padding: 12px; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: #aaa; padding: 12px; border-bottom: 1px solid #444; font-size: 11px; text-transform: uppercase; }
+  td { padding: 14px 12px; border-bottom: 1px solid #222; font-size: 14px; }
 
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-  .sheet { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 2px solid var(--gold); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .sheet { background: #0a0a0a; padding: 30px; border-radius: 12px; border: 2px solid var(--gold); width: 100%; max-width: 480px; }
   label { font-size: 11px; font-weight: 900; color: var(--gold); display: block; margin-top: 15px; text-transform: uppercase; }
-  input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+  input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
   
-  .calc-display { background: #222; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold); margin-top: 5px; font-weight: bold; color: #fff; }
-  .receipt-preview { background: #000; padding: 15px; border-radius: 8px; border: 1px dashed var(--gold); margin-top: 15px; color: var(--success); font-family: monospace; font-size: 12px; white-space: pre-wrap; }
-  .del-btn { background: #300; color: #ff5a5a; border: 1px solid #500; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 10px; }
-  .version-tag { text-align: center; font-size: 10px; color: #444; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
+  .receipt-preview { background: #000; padding: 20px; border-radius: 8px; border: 1px solid #555; margin-top: 20px; color: #fff; font-family: monospace; font-size: 14px; line-height: 1.6; }
+  .receipt-header { border-bottom: 1px dashed #555; margin-bottom: 10px; padding-bottom: 10px; text-align: center; color: var(--gold); font-weight: bold; font-size: 16px; }
+  
+  .row-actions { display: flex; gap: 8px; }
+  .sm-btn { padding: 8px 12px; font-size: 10px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; text-transform: uppercase; }
+  .btn-edit { background: #333; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-del { background: transparent; color: #888; }
+
+  /* STANDOUT BACKUP BUTTONS */
+  .system-controls { text-align: center; padding: 40px 20px; background: #080808; border-top: 1px solid #222; margin-top: 50px; }
+  .btn-backup { background: var(--gold); color: #000; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+  .btn-restore { background: #000; color: var(--gold); border: 2px solid var(--gold); }
+
+  .version-tag { text-align: center; font-size: 12px; color: #ffffff; font-weight: bold; margin-top: 20px; letter-spacing: 2px; text-transform: uppercase; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-placeholder">LA PERRERÍA GOURMET</div>
-  <div class="logo-sub">NATURAL PET FOOD PV</div>
+  <div class="logo-upload-zone" onclick="document.getElementById('logoInput').click()">
+    <img id="mainLogo" src="" style="display:none;">
+    <div id="logoLabel" class="upload-text">LOGO: CLICK HERE TO UPLOAD</div>
+  </div>
+  <input type="file" id="logoInput" hidden accept="image/*" onchange="uploadLogo(event)">
 </header>
 
 <main>
   <div class="dash-grid">
-    <div class="stat-card">
-      <div class="stat-label">Inventory Balance</div>
-      <div id="stockVal" class="stat-val">0.0 kg</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Today's Revenue</div>
-      <div id="todaySales" class="stat-val">$0.00</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Today's Volume</div>
-      <div id="todayKilos" class="stat-val">0.0 kg</div>
-    </div>
+    <div class="stat-card"><div class="stat-label">Chicken in Stock</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Today's Total Sales</div><div id="todaySales" class="stat-val">$0.00</div></div>
+    <div class="stat-card"><div class="stat-label">Kilos Sold Today</div><div id="todayKilos" class="stat-val">0.0 kg</div></div>
   </div>
 
   <div class="action-bar">
-    <button class="btn btn-gold" onclick="openModal('saleModal')">➕ NEW SALE</button>
-    <button class="btn btn-outline" onclick="openModal('stockModal')">📦 ADD STOCK</button>
-    <button class="btn btn-danger" onclick="openModal('expenseModal')">💸 EXPENSE</button>
+    <button class="btn btn-gold" onclick="openModal('saleModal')">Create Order</button>
+    <button class="btn btn-outline" onclick="openModal('stockModal')">Add Stock</button>
+    <button class="btn btn-danger" onclick="openModal('expenseModal')">Add Expense</button>
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0; color:var(--gold); font-size:14px;">SALES & STOCK LEDGER</h3>
+    <h3 style="margin-top:0; color:var(--gold); font-size:13px; letter-spacing:1px;">CLIENT DIRECTORY</h3>
     <div class="table-container">
       <table>
-        <thead>
-          <tr><th>Date</th><th>Client/Supplier</th><th>Kilos</th><th>Total</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Customer</th><th>Total Kilos</th><th>Last Date</th></tr></thead>
+        <tbody id="clientBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; color:var(--gold); font-size:13px; letter-spacing:1px;">TRANSACTION LOG</h3>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Date</th><th>Entry</th><th>Weight</th><th>Total</th><th>Options</th></tr></thead>
         <tbody id="ledgerBody"></tbody>
       </table>
     </div>
   </div>
 
-  <div style="text-align:center; padding:20px; opacity:0.3;">
-    <button class="btn btn-outline" style="font-size:10px;" onclick="exportData()">💾 BACKUP</button>
+  <!-- BRIGHT SYSTEM CONTROLS -->
+  <div class="system-controls">
+    <h4 style="color:var(--gold); margin-bottom:20px; font-size:11px; letter-spacing:2px;">DATA MANAGEMENT</h4>
+    <button class="btn btn-backup" onclick="exportData()">💾 BACKUP ALL DATA</button>
+    <button class="btn btn-restore" style="margin-left:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE DATA</button>
     <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-    <button class="btn btn-outline" style="font-size:10px;" onclick="document.getElementById('importFile').click()">📂 RESTORE</button>
+    <div class="version-tag">VERSION 7.9 • STABLE BUILD</div>
   </div>
-  
-  <div class="version-tag">Build: 7.3 (Calculated Totals)</div>
 </main>
 
-<!-- SALE MODAL -->
+<!-- ORDER MODAL -->
 <div id="saleModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin-top:0;">NEW SALE</h2>
+    <h2 id="saleTitle" style="color:var(--gold); margin-top:0; font-size:20px;">NEW ORDER</h2>
+    <input type="hidden" id="editId">
+    
     <label>Date</label><input id="sDate" type="date">
     <label>Client Name</label><input id="sClient" oninput="updateReceipt()">
-    <label>WhatsApp</label><input id="sPhone" oninput="updateReceipt()">
-    <label>Address</label><textarea id="sAddress" rows="2" oninput="updateReceipt()"></textarea>
+    <label>WhatsApp #</label><input id="sPhone" placeholder="10 digits" oninput="updateReceipt()">
+    <label>Address</label><textarea id="sAddress" rows="1" oninput="updateReceipt()"></textarea>
     
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-      <div><label>Kilos</label><input id="sKilos" type="number" value="1" oninput="updateReceipt()"></div>
-      <div><label>Price/kg</label><input id="sPrice" type="number" value="50" oninput="updateReceipt()"></div>
-      <div><label>Product Total</label><div id="prodTotalDisplay" class="calc-display">$0</div></div>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <div style="flex:1;"><label>Kilos</label><input id="sKilos" type="number" step="0.1" value="1" oninput="updateReceipt()"></div>
+      <div style="flex:1;"><label>Price/kg</label><input id="sPrice" type="number" value="50" oninput="updateReceipt()"></div>
+      <div style="flex:1;"><label>Envío</label><input id="sDelivery" type="number" value="10" oninput="updateReceipt()"></div>
     </div>
-    
-    <label>Delivery Fee (Default: 10)</label>
-    <input id="sDelivery" type="number" value="10" oninput="updateReceipt()">
 
-    <div id="receiptPreview" class="receipt-preview"></div>
+    <div id="receiptPreview" class="receipt-preview">
+        <div class="receipt-header">LA PERRERÍA GOURMET PV</div>
+        <div id="receiptContent">...</div>
+        <div style="text-align:center; margin-top:15px; font-weight:bold; color:var(--gold); font-size:22px; border-top:1px solid #333; padding-top:10px;" id="grandTotalLabel">TOTAL: $0</div>
+    </div>
+
     <button class="btn btn-wa-action" onclick="sendWhatsApp()">📱 SEND WHATSAPP</button>
-    <button class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="addSale()">SAVE SALE</button>
-    <button class="btn" style="width:100%; color:#555;" onclick="closeModal('saleModal')">CANCEL</button>
+    <button class="btn btn-gold" style="width:100%; margin-top:15px;" onclick="saveSale()">SAVE ORDER</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('saleModal')">CANCEL</button>
 </div></div>
 
-<!-- STOCK MODAL -->
+<!-- STOCK & EXPENSE MODALS -->
 <div id="stockModal" class="modal"><div class="sheet">
-    <h2 style="color:var(--gold); margin-top:0;">ADD STOCK</h2>
+    <h2 id="stockTitle" style="color:var(--gold); margin-top:0;">ADD STOCK</h2>
+    <input type="hidden" id="stEditId">
     <label>Date</label><input id="stDate" type="date">
-    <label>Supplier / Vendor</label><input id="stSupplier" placeholder="Meat Source">
-    <label>Kilos Received</label><input id="stKilos" type="number" step="0.1">
+    <label>Supplier / Item</label><input id="stSupplier">
+    <label>Kilos</label><input id="stKilos" type="number" step="0.1">
     <label>Cost ($)</label><input id="stCost" type="number">
-    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="addStock()">SAVE STOCK</button>
-    <button class="btn" style="width:100%; color:#555;" onclick="closeModal('stockModal')">CANCEL</button>
+    <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="saveStock()">SAVE STOCK</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('stockModal')">CANCEL</button>
 </div></div>
 
-<!-- EXPENSE MODAL -->
 <div id="expenseModal" class="modal"><div class="sheet">
-    <h2 style="color:#ff5a5a; margin-top:0;">RECORD EXPENSE</h2>
+    <h2 id="expenseTitle" style="color:var(--danger); margin-top:0;">ADD EXPENSE</h2>
+    <input type="hidden" id="exEditId">
     <label>Date</label><input id="exDate" type="date">
-    <label>Description</label><input id="exNote">
+    <label>Reason</label><input id="exNote">
     <label>Amount ($)</label><input id="exCost" type="number">
-    <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="addExpense()">SAVE EXPENSE</button>
-    <button class="btn" style="width:100%; color:#555;" onclick="closeModal('expenseModal')">CANCEL</button>
+    <button class="btn btn-danger" style="width:100%; margin-top:20px;" onclick="saveExpense()">SAVE EXPENSE</button>
+    <button class="btn" style="width:100%; color:#666;" onclick="closeModal('expenseModal')">CANCEL</button>
 </div></div>
 
 <script>
-let bizData = JSON.parse(localStorage.getItem("perreria_v7") || '{"stock":0, "transactions":[]}');
+let bizData = JSON.parse(localStorage.getItem("perreria_v7_7") || '{"transactions":[], "logo": null}');
 
-function save() { localStorage.setItem("perreria_v7", JSON.stringify(bizData)); render(); }
+function save() { localStorage.setItem("perreria_v7_7", JSON.stringify(bizData)); render(); }
+
+function uploadLogo(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        bizData.logo = reader.result;
+        save();
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
 
 function openModal(id) { 
-    const today = new Date().toISOString().slice(0,10);
-    document.querySelectorAll('input[type="date"]').forEach(i => i.value = today);
-    if(id === 'saleModal') { document.getElementById('sDelivery').value = 10; }
-    updateReceipt();
     document.getElementById(id).style.display = "flex"; 
-}
-
-function closeModal(id) { document.getElementById(id).style.display = "none"; }
-
-function updateReceipt() {
-    const name = document.getElementById('sClient').value || "Cliente";
-    const k = parseFloat(document.getElementById('sKilos').value) || 0;
-    const p = parseFloat(document.getElementById('sPrice').value) || 0;
-    const del = parseFloat(document.getElementById('sDelivery').value) || 0;
-    
-    const prodTotal = k * p;
-    document.getElementById('prodTotalDisplay').innerText = `$${prodTotal}`;
-    
-    const deliveryText = (del === 0) ? "GRATIS" : `$${del}`;
-    const grandTotal = prodTotal + del;
-
-    // Spanish Receipt Body
-    const msg = `🍗 *La Perrería Gourmet PV*\n¡Pedido Confirmado!\n\nCliente: ${name}\nOrden: ${k}kg ($${p}/kg)\nSubtotal: $${prodTotal}\nEnvío: ${deliveryText}\n*Total: $${grandTotal} MXN*\n\n📍 Entrega: ${document.getElementById('sAddress').value || 'Por definir'}\n\n¡Gracias por su compra!`;
-    document.getElementById('receiptPreview').innerText = msg;
-}
-
-function sendWhatsApp() {
-    const phone = document.getElementById('sPhone').value.replace(/\D/g,'');
-    const msg = encodeURIComponent(document.getElementById('receiptPreview').innerText);
-    if(phone) {
-        const prefix = phone.length === 10 ? '52' : '';
-        window.open(`https://wa.me/${prefix}${phone}?text=${msg}`, '_blank');
+    const today = new Date().toISOString().slice(0,10);
+    if(id === 'saleModal') {
+        document.getElementById('sDate').value = today;
+        updateReceipt();
     }
 }
 
-function addSale() {
+function closeModal(id) { 
+    document.getElementById(id).style.display = "none";
+    document.getElementById('editId').value = "";
+    document.getElementById('stEditId').value = "";
+    document.getElementById('exEditId').value = "";
+}
+
+function updateReceipt() {
+    const k = parseFloat(document.getElementById('sKilos').value) || 0;
+    const p = parseFloat(document.getElementById('sPrice').value) || 0;
+    const del = parseFloat(document.getElementById('sDelivery').value) || 0;
+    const total = (k * p) + del;
+    document.getElementById('grandTotalLabel').innerText = `TOTAL: $${total} MXN`;
+    
+    document.getElementById('receiptContent').innerHTML = `
+        CLIENTE: ${document.getElementById('sClient').value || "..."}<br>
+        PEDIDO: ${k}kg x $${p}/kg<br>
+        ENVÍO: $${del}<br>
+        📍 DIR: ${document.getElementById('sAddress').value || "Delivery"}
+    `;
+}
+
+function sendWhatsApp() {
+    const k = document.getElementById('sKilos').value;
+    const p = document.getElementById('sPrice').value;
+    const del = document.getElementById('sDelivery').value;
+    const total = (parseFloat(k)*parseFloat(p)) + parseFloat(del);
+    const client = document.getElementById('sClient').value;
+    const phone = document.getElementById('sPhone').value.replace(/\D/g,'');
+    
+    const msg = encodeURIComponent(`🍗 *LA PERRERÍA GOURMET PV*\n--------------------------\n*CLIENTE:* ${client}\n*PEDIDO:* ${k}kg x $${p} = $${k*p}\n*ENVÍO:* $${del}\n--------------------------\n*TOTAL A PAGAR: $${total} MXN*\n--------------------------\n📍 *DIR:* ${document.getElementById('sAddress').value}\n\n¡Gracias por preferir calidad gourmet!`);
+    
+    if(phone) window.open(`https://wa.me/${phone.length === 10 ? '52'+phone : phone}?text=${msg}`, '_blank');
+}
+
+function saveSale() {
+    const id = document.getElementById('editId').value;
     const k = parseFloat(document.getElementById('sKilos').value);
     const p = parseFloat(document.getElementById('sPrice').value);
     const del = parseFloat(document.getElementById('sDelivery').value);
-    bizData.transactions.push({ id: Date.now(), date: document.getElementById('sDate').value, type: 'sale', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del });
-    bizData.stock -= k;
+    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('sDate').value, type: 'SALE', client: document.getElementById('sClient').value, kilos: k, total: (k * p) + del, address: document.getElementById('sAddress').value, phone: document.getElementById('sPhone').value, pricePerKg: p, delFee: del };
+    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    bizData.transactions.push(entry);
     save(); closeModal('saleModal');
 }
 
-function addStock() {
-    const k = parseFloat(document.getElementById('stKilos').value);
-    bizData.transactions.push({ id: Date.now(), date: document.getElementById('stDate').value, type: 'stock', client: document.getElementById('stSupplier').value, kilos: k, total: -parseFloat(document.getElementById('stCost').value) });
-    bizData.stock += k;
+function saveStock() {
+    const id = document.getElementById('stEditId').value;
+    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('stDate').value, type: 'STOCK', client: document.getElementById('stSupplier').value, kilos: parseFloat(document.getElementById('stKilos').value), total: -parseFloat(document.getElementById('stCost').value) };
+    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    bizData.transactions.push(entry);
     save(); closeModal('stockModal');
 }
 
-function addExpense() {
-    bizData.transactions.push({ id: Date.now(), date: document.getElementById('exDate').value, type: 'expense', client: document.getElementById('exNote').value, kilos: 0, total: -parseFloat(document.getElementById('exCost').value) });
+function saveExpense() {
+    const id = document.getElementById('exEditId').value;
+    const entry = { id: id ? parseInt(id) : Date.now(), date: document.getElementById('exDate').value, type: 'EXPENSE', client: document.getElementById('exNote').value, kilos: 0, total: -parseFloat(document.getElementById('exCost').value) };
+    if(id) bizData.transactions = bizData.transactions.filter(t => t.id !== parseInt(id));
+    bizData.transactions.push(entry);
     save(); closeModal('expenseModal');
 }
 
 function deleteTx(id) {
-    if(confirm("Delete this entry and adjust stock?")) {
-        const tx = bizData.transactions.find(t => t.id === id);
-        if(tx.type === 'sale') bizData.stock += tx.kilos;
-        if(tx.type === 'stock') bizData.stock -= tx.kilos;
+    if(confirm("Confirm: Delete record?")) {
         bizData.transactions = bizData.transactions.filter(t => t.id !== id);
         save();
     }
 }
 
+function editTx(id) {
+    const t = bizData.transactions.find(x => x.id === id);
+    if(t.type === 'SALE') {
+        openModal('saleModal');
+        document.getElementById('editId').value = t.id;
+        document.getElementById('saleTitle').innerText = "EDIT ORDER";
+        document.getElementById('sDate').value = t.date;
+        document.getElementById('sClient').value = t.client;
+        document.getElementById('sPhone').value = t.phone || "";
+        document.getElementById('sAddress').value = t.address || "";
+        document.getElementById('sKilos').value = t.kilos;
+        document.getElementById('sPrice').value = t.pricePerKg || 50;
+        document.getElementById('sDelivery').value = t.delFee || 0;
+        updateReceipt();
+    } else if(t.type === 'STOCK') {
+        openModal('stockModal');
+        document.getElementById('stEditId').value = t.id;
+        document.getElementById('stDate').value = t.date;
+        document.getElementById('stSupplier').value = t.client;
+        document.getElementById('stKilos').value = t.kilos;
+        document.getElementById('stCost').value = Math.abs(t.total);
+    } else {
+        openModal('expenseModal');
+        document.getElementById('exEditId').value = t.id;
+        document.getElementById('exDate').value = t.date;
+        document.getElementById('exNote').value = t.client;
+        document.getElementById('exCost').value = Math.abs(t.total);
+    }
+}
+
 function render() {
     const today = new Date().toISOString().slice(0,10);
-    let dK = 0, dS = 0;
-    document.getElementById('stockVal').innerText = bizData.stock.toFixed(1) + ' kg';
+    let dK = 0, dS = 0, stock = 0;
+    const clients = {};
+
+    if(bizData.logo) {
+        document.getElementById('mainLogo').src = bizData.logo;
+        document.getElementById('mainLogo').style.display = "block";
+        document.getElementById('logoLabel').style.display = "none";
+    }
+
     const sorted = bizData.transactions.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+    
     document.getElementById('ledgerBody').innerHTML = sorted.map(t => {
-        if(t.date === today && t.type === 'sale') { dK += t.kilos; dS += t.total; }
-        const color = t.total > 0 ? 'var(--success)' : '#ff5a5a';
+        if(t.type === 'SALE') {
+            stock -= t.kilos;
+            if(t.date === today) { dK += t.kilos; dS += t.total; }
+            clients[t.client] = { kilos: (clients[t.client]?.kilos || 0) + t.kilos, date: t.date };
+        }
+        if(t.type === 'STOCK') stock += t.kilos;
+        
         return `<tr>
-            <td>${t.date.slice(5)}</td>
-            <td><strong>${t.client}</strong><br><small style="color:#666">${t.type.toUpperCase()}</small></td>
+            <td style="color:#888">${t.date.slice(5)}</td>
+            <td><strong>${t.client}</strong></td>
             <td>${t.kilos ? t.kilos+'kg' : '-'}</td>
-            <td style="color:${color}; font-weight:bold;">$${Math.abs(t.total).toFixed(2)}</td>
-            <td><button class="del-btn" onclick="deleteTx(${t.id})">DELETE</button></td>
+            <td style="color:${t.total > 0 ? 'var(--success)' : 'var(--danger)'}">$${Math.abs(t.total).toFixed(2)}</td>
+            <td class="row-actions">
+                <button class="sm-btn btn-edit" onclick="editTx(${t.id})">Edit</button>
+                <button class="sm-btn btn-del" onclick="deleteTx(${t.id})">X</button>
+            </td>
         </tr>`;
     }).join("");
+
+    document.getElementById('clientBody').innerHTML = Object.keys(clients).map(name => `
+        <tr><td>${name}</td><td>${clients[name].kilos.toFixed(1)} kg</td><td>${clients[name].date}</td></tr>
+    `).join("");
+
+    document.getElementById('stockVal').innerText = stock.toFixed(1) + ' kg';
     document.getElementById('todaySales').innerText = '$' + dS.toFixed(2);
     document.getElementById('todayKilos').innerText = dK.toFixed(1) + ' kg';
 }
@@ -232,12 +330,16 @@ function render() {
 function exportData() {
     const blob = new Blob([JSON.stringify(bizData)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `Perreria_V7_3_Backup.json`; a.click();
+    a.download = `Perreria_Backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
 }
 
 function importData(event) {
     const reader = new FileReader();
-    reader.onload = (e) => { bizData = JSON.parse(e.target.result); save(); };
+    reader.onload = (e) => { 
+        if(confirm("This will replace your current data. Continue?")) {
+            bizData = JSON.parse(e.target.result); save(); 
+        }
+    };
     reader.readAsText(event.target.files[0]);
 }
 
