@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Perrería Gourmet PV – Version 10.7 (Timezone Fixed)</title>
+<title>La Perrería Gourmet PV – Version 10.7 (Locked + Kilo Tracker)</title>
 <style>
   :root { --gold: #d4af37; --bg: #000000; --card-bg: #111111; --text: #ffffff; --danger: #ff4444; --success: #25D366; --pending: #ffcc00; --blue: #3498db; }
   body { margin:0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 150px; }
@@ -15,6 +15,7 @@
   .stat-card { background: var(--card-bg); border: 1px solid #333; padding: 12px; border-radius: 8px; border-left: 4px solid var(--gold); }
   .stat-card.delivery { border-left-color: var(--blue); }
   .stat-card.free-gift { border-left-color: #555; }
+  .stat-card.kilos-sold { border-left-color: #ff8c00; }
   .stat-label { font-size: 8px; color: var(--gold); text-transform: uppercase; font-weight: 900; }
   .stat-val { font-size: 16px; font-weight: 700; color: #fff; margin-top: 4px; }
   .action-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
@@ -58,7 +59,8 @@
   </div>
 
   <div class="dash-grid">
-    <div class="stat-card"><div class="stat-label">Chicken (Main)</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card"><div class="stat-label">Chicken (Stock)</div><div id="stockVal" class="stat-val">0.0 kg</div></div>
+    <div class="stat-card kilos-sold"><div class="stat-label">Kilos Sold Today</div><div id="kiloSoldDay" class="stat-val">0.0 kg</div></div>
     <div class="stat-card"><div class="stat-label">Gizzards</div><div id="gizVal" class="stat-val">0g</div></div>
     <div class="stat-card"><div class="stat-label">Feet</div><div id="feetVal" class="stat-val">0g</div></div>
     <div class="stat-card"><div class="stat-label">Revenue</div><div id="todaySales" class="stat-val">$0 MXN</div></div>
@@ -70,6 +72,7 @@
     <button class="btn btn-gold" onclick="openModal('saleModal')">New Order</button>
     <button class="btn btn-outline" onclick="openModal('stockModal')">+ Stock</button>
     <button class="btn btn-danger-action" onclick="openModal('expenseModal')">+ Expense / Loss</button>
+    <button class="btn" style="background:#ff8c00; color:#000;" onclick="alert('Kilos Sold Today: ' + document.getElementById('kiloSoldDay').innerText)">📊 View Daily Kilos</button>
     <button class="btn" style="background:#440000; color:var(--gold); border:1px solid var(--danger);" onclick="closeBatch()">Close Batch</button>
   </div>
 
@@ -162,7 +165,6 @@
 <script>
 let bizData = JSON.parse(localStorage.getItem("perreria_v10") || '{"transactions":[], "logo": null, "batchHistory": []}');
 
-// Helper to get date for Puerto Vallarta regardless of server location
 function getPVDate() {
     return new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Bahia_Banderas',
@@ -263,7 +265,7 @@ function deleteTx(id) { if(confirm("Delete?")) { bizData.transactions = bizData.
 
 function render() {
     const today = getPVDate();
-    let s_chicken = 0, s_giz = 0, s_feet = 0, pRev = 0, dRev = 0, fCount = 0;
+    let s_chicken = 0, s_giz = 0, s_feet = 0, pRev = 0, dRev = 0, fCount = 0, kSoldToday = 0;
     const logoImg = document.getElementById('mainLogo');
     if(bizData.logo) { logoImg.src = bizData.logo; logoImg.style.display = "block"; document.getElementById('logoLabel').style.display = "none"; }
     else { logoImg.style.display = "none"; document.getElementById('logoLabel').style.display = "block"; }
@@ -276,6 +278,7 @@ function render() {
             if(prod === "CHICKEN") s_chicken += factor; else if(prod === "GIZZARDS") s_giz += factor; else s_feet += factor;
             if(t.type === 'SALE' && t.date === today && t.status === 'COMPLETED') { 
                 pRev += (t.total - t.delFee); dRev += t.delFee; 
+                if(prod === "CHICKEN") kSoldToday += amt;
                 if(t.pricePerKg === 0) fCount += amt; 
             }
         } else if (t.type === 'STOCK') { if(prod === "CHICKEN") s_chicken += amt; else if(prod === "GIZZARDS") s_giz += amt; else s_feet += amt; }
@@ -283,6 +286,7 @@ function render() {
     }).join("");
 
     document.getElementById('stockVal').innerText = s_chicken.toFixed(1) + ' kg';
+    document.getElementById('kiloSoldDay').innerText = kSoldToday.toFixed(1) + ' kg';
     document.getElementById('gizVal').innerText = s_giz.toFixed(0) + 'g';
     document.getElementById('feetVal').innerText = s_feet.toFixed(0) + 'g';
     document.getElementById('todaySales').innerText = '$' + pRev.toFixed(0) + ' MXN';
